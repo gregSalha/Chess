@@ -1,0 +1,1 @@
+g++ -o chess.exe main.cpp Board.cpp Game.cpp IA.cpp indexHandler.cpp Move.cpp Pieces.cpp
