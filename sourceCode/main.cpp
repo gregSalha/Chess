@@ -6,28 +6,32 @@
 
 int main(int argc, char** argv)
 {
-    std::cout << "Number of game to play?" << std::endl;
-    int NGame(0);
-    std::cin >> NGame;
-    std::cout << "Maximum number of move?" << std::endl;
-    int Nmove(0);
-    std::cin >> Nmove;
-    std::cout << "Folder to save the game?" << std::endl;
-    std::string targetFolder("");
-    std::getline(std::cin, targetFolder);
-    std::system("rm -r ./games/test");
-    std::system("mkdir ./games/test");
+    std::cout << "Number of games to play?" << std::endl;
+    std::string bufferInt;
+    std::getline(std::cin, bufferInt);
+    int NGame = std::stoi(bufferInt);
+
+    std::cout << "Maximum number of moves?" << std::endl;
+    std::getline(std::cin, bufferInt);
+    int NMove = std::stoi(bufferInt);
+
+    std::cout << "Folder to save games?" << std::endl;
+    std::string folderToSaveGame;
+    std::getline(std::cin, folderToSaveGame);
+
+    std::system(("rm -rf ./games/" + folderToSaveGame).c_str());
+    std::system(("mkdir -p ./games/" + folderToSaveGame).c_str());
     std::mt19937_64 G(std::time(NULL));
     for (int i = 0; i<NGame; i++){
       Board startingPos;
       randomIA whiteIA('W');
       randomIA blackIA('B');
       Game partie;
-      partie.play(G, Nmove, whiteIA, blackIA);
-      std::ofstream myFile("./games/" + targetFolder + "/test" + std::to_string(i) + ".pgn");
+      partie.play(G, NMove, whiteIA, blackIA);
+      std::ofstream myFile("./games/" + folderToSaveGame + "/game" + std::to_string(i) + ".pgn");
       partie.write(myFile);
       myFile.close();
-      std::cout << "Game " + std::to_string(i) << " played. Result: " << partie.getResult() << " in "<< partie.getNMovedPlayed() << " moves." << std::endl;
+      std::cout << "Game " + std::to_string(i) << " played. Made "<< partie.getNMovedPlayed() << " moves. Result: " << partie.getResult() <<  std::endl;
     }
   return 0;
 }

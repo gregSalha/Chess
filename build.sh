@@ -1,1 +1,3 @@
-g++ -o chess.exe main.cpp Board.cpp Game.cpp IA.cpp indexHandler.cpp Move.cpp Pieces.cpp
+rm -rf chessApp
+mkdir chessApp
+g++ -o chessApp/chess.exe sourceCode/main.cpp sourceCode/Board.cpp sourceCode/Game.cpp sourceCode/IA.cpp sourceCode/indexHandler.cpp sourceCode/Move.cpp sourceCode/Pieces.cpp
