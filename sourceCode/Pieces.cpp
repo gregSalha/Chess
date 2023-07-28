@@ -4,7 +4,7 @@ void operator<<(std::ostream & flux, const Piece & p){
     flux << p.color << p.kind << " ";
 }
 
-void Piece::exploreCardinalDirections(std::list<std::pair<int, int>> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & listCardinal) const{
+void Piece::exploreCardinalDirections(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & listCardinal) const{
     for (auto cardinal=listCardinal.begin(); cardinal!=listCardinal.end(); cardinal++){
         int currentX(posX);
         int currentY(posY);
@@ -17,56 +17,60 @@ void Piece::exploreCardinalDirections(std::list<std::pair<int, int>> & res, cons
             else{
                 if (table[getIndex(currentX, currentY)].getColor()!='_'){
                     if (table[getIndex(currentX, currentY)].getColor()!=color){
-                        res.push_front({currentX, currentY});
+                        res.push_front({currentX, currentY, Standard});
                     }
                     break;
                 }
                 else{
-                    res.push_front({currentX, currentY});
+                    res.push_front({currentX, currentY, Standard});
                 }
             }
         }
     }
 }
 
-void Piece::exploreFixedPositions(std::list<std::pair<int, int>> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & positionsToExplore) const{
+void Piece::exploreFixedPositions(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & positionsToExplore) const{
     for (auto pos=positionsToExplore.begin(); pos != positionsToExplore.end(); pos++){
         int currentX = posX + pos->first;
         int currentY = posY + pos->second;
         if (currentX>=0 && currentX<8 && currentY>=0 && currentY<8){
             if (table[getIndex(currentX, currentY)].getColor()!=color){
-                res.push_front({currentX, currentY});
+                res.push_front({currentX, currentY, Standard});
             }
         }
     }
 }
 
-std::list<std::pair<int, int>> Piece::getStandardDeplacement(const std::vector<Piece> & table) const{
-    std::list<std::pair<int, int>> res(0);
+std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table) const{
+    std::list<deplacement> res(0);
     switch(kind){
         case 'P':{
             int codeCouleur(1);
             if (color=='B'){
                 codeCouleur = -1;
             }
-            if (codeCouleur*posY < codeCouleur*(6-5*(1-codeCouleur)/2)){
+            std::vector<deplacementTag> tags({Standard});
+            if (2*posY == 7+5*codeCouleur){
+                tags = {PromotionMoveQ, PromotionMoveR, PromotionMoveB, PromotionMoveN};
+            }
+            for (auto tag= tags.begin(); tag != tags.end(); tag++){
                 if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_'){
-                    res.push_front({posX, posY+codeCouleur});
+                    res.push_front({posX, posY+codeCouleur, *tag});
                 }
                 if (posX>0){
                     if (table[getIndex(posX-1, posY+codeCouleur)].getColor() != color && table[getIndex(posX-1, posY+codeCouleur)].getColor() != '_'){
-                        res.push_front({posX-1, posY+codeCouleur});
+                        res.push_front({posX-1, posY+codeCouleur, *tag});
                     }
                 }
                 if (posX<7){
                     if (table[getIndex(posX+1, posY+codeCouleur)].getColor() != color && table[getIndex(posX+1, posY+codeCouleur)].getColor() != '_'){
-                        res.push_front({posX+1, posY+codeCouleur});
+                        res.push_front({posX+1, posY+codeCouleur, *tag});
                     }
                 }
-                if (posY == 1 + 5*(1-codeCouleur)/2){
-                    if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_' && table[getIndex(posX, posY+2*codeCouleur)].getKind() == '_'){
-                        res.push_front({posX, posY+2*codeCouleur});
-                    }
+            }
+            if (posY == 1 + 5*(1-codeCouleur)/2){
+                if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_' && table[getIndex(posX, posY+2*codeCouleur)].getKind() == '_'){
+                    res.push_front({posX, posY+2*codeCouleur, PawnFirstJump});
                 }
             }
         }
@@ -100,80 +104,23 @@ std::list<std::pair<int, int>> Piece::getStandardDeplacement(const std::vector<P
     return res;
 }
 
-std::list<Move> Piece::getMove(const std::vector<Piece> & table) const{
-    std::list<Move> res(0);
-    std::list<std::pair<int, int>> standardDeplacement = this->getStandardDeplacement(table);
-    for (auto deplacement=standardDeplacement.begin(); deplacement!=standardDeplacement.end(); deplacement++){
-        res.push_front(this->standardMove(deplacement->first, deplacement->second, table));
-    }
 
-    std::string kinds = "QRBN";
-    if (kind=='P' && color=='W' && posY==6){
-        for (int i=0; i<4; i++){
-            std::list<Move> newMoves = this->getPromotionMove(table, kinds[i]);
-            for (auto j = newMoves.begin(); j!= newMoves.end(); j++){
-                res.push_front(*j);
-            }
+Piece Piece::deplacePiece(deplacement depl) const{
+    switch(depl.tag){
+        case PromotionMoveQ:{
+            return Piece(depl.destinationX, depl.destinationY, color, 'Q');
+        }
+        case PromotionMoveB:{
+            return Piece(depl.destinationX, depl.destinationY, color, 'B');
+        }
+        case PromotionMoveN:{
+            return Piece(depl.destinationX, depl.destinationY, color, 'N');
+        }
+        case PromotionMoveR:{
+            return Piece(depl.destinationX, depl.destinationY, color, 'R');
+        }
+        default:{
+            return Piece(depl.destinationX, depl.destinationY, color, kind);
         }
     }
-    if (kind=='P' && color=='B' && posY==1){
-       for (int i=0; i<4; i++){
-            std::list<Move> newMoves = this->getPromotionMove(table, kinds[i]);
-            for (auto j = newMoves.begin(); j!= newMoves.end(); j++){
-                res.push_front(*j);
-            }
-        }
-    }
-    return res;
-}
-
-std::list<Move> Piece::getPromotionMove(const std::vector<Piece> & table, char promotedKind) const{
-    std::list<Move> res(0);
-    std::string letterReference("abcdefgh");
-    std::string numberReference("12345678");
-    std::string Notation = "";
-    std::string baseNotation = "";
-    baseNotation = baseNotation + kind + letterReference[posX] + numberReference[posY];
-    int codeCouleur(1);
-    if (color=='B'){
-        codeCouleur = -1;
-    }
-    if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_'){
-        Notation = baseNotation + letterReference[posX] + numberReference[posY+codeCouleur] + '=' + promotedKind;
-        Move newMove({*this}, {Piece(posX, posY+codeCouleur, color, promotedKind)}, Notation);
-        res.push_front({newMove});
-    }
-
-    if (posX>0){
-        if (table[getIndex(posX-1, posY+codeCouleur)].getColor() != color && table[getIndex(posX-1, posY+codeCouleur)].getColor() != '_'){
-            Notation = baseNotation + letterReference[posX-1] + numberReference[posY+codeCouleur] + '=' + promotedKind;
-            Move newMove({*this, table[getIndex(posX-1, posY+codeCouleur)]}, {Piece(posX-1, posY+codeCouleur, color, promotedKind)}, Notation);
-            res.push_front({newMove});
-        }
-    }
-    if (posX<7){
-        if (table[getIndex(posX+1, posY+codeCouleur)].getColor() != color && table[getIndex(posX+1, posY+codeCouleur)].getColor() != '_'){
-            Notation = baseNotation + letterReference[posX+1] + numberReference[posY+codeCouleur] + '=' + promotedKind;
-            Move newMove({*this, table[getIndex(posX+1, posY+codeCouleur)]}, {Piece(posX+1, posY+codeCouleur, color, promotedKind)}, Notation);
-            res.push_front({newMove});
-        }
-    }
-    return res;
-}
-
-Move Piece::standardMove(int destinationX, int destinationY, const std::vector<Piece> & table) const{
-  std::string letterReference("abcdefgh");
-  std::string numberReference("12345678");
-  int destinationIndex = getIndex(destinationX, destinationY);
-  std::string Notation = "";
-  Notation = Notation + kind + letterReference[posX] + numberReference[posY];
-  Piece movedPiece = Piece(destinationX, destinationY, color, kind);
-  if (table[destinationIndex].getColor()=='_'){
-    Notation = Notation + letterReference[destinationX] + numberReference[destinationY];
-    return Move({*this}, {movedPiece}, Notation);
-  }
-  else{
-    Notation = Notation + 'x' + letterReference[destinationX] + numberReference[destinationY];
-    return Move({*this, table[destinationIndex]}, {movedPiece}, Notation);
-  }
 }

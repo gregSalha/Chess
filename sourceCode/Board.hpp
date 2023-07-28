@@ -1,12 +1,17 @@
-//#ifndef BOARD_HPP_INCLUDED
-//#define BOARD_HPP_INCLUDED
+#ifndef BOARD_HPP_INCLUDED
+#define BOARD_HPP_INCLUDED
 #include <vector>
 
-#include "Move.hpp"
+#include"Pieces.hpp"
+#include"Move.hpp"
+#include"boardFlags.hpp"
+
+class Move;
 
 class Board{
 private:
     std::vector<Piece> table;
+    boardFlags flags;
     char turn;
 public:
     //constructeurs et accesseurs
@@ -16,10 +21,7 @@ public:
 
     //accesseurs
     char getTurn() const{return turn;};
-
-    //permet d'obtenir les mouvements légaux
-    std::list<Move> getPotentialMove() const;
-    std::list<Move> getLegalMove();
+    Piece operator[](int index) const;
 
     void computeMove(Move m);
     void unComputeMove(Move m);
@@ -27,7 +29,13 @@ public:
     bool kingIsPending();
     bool isLegal(Move m);
 
+    Move constructMove(Piece movingPiece, deplacement depl) const;
+
+    std::list<Move> getPotentialMove() const;
+    std::list<Move> getLegalMove();
     friend void operator<< (std::ostream & flux, const Board & B);
 };
 
-//#endif // BOARD_HPP_INCLUDED
+
+
+#endif // BOARD_HPP_INCLUDED

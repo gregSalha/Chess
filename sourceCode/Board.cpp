@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-Board::Board(): table(64), turn('W'){
+Board::Board(): table(64), turn('W'), flags({-1}){
 
     //Pawn creation
     for (int i = 0; i<8; i++){
@@ -44,13 +44,17 @@ Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn){}
 
 Board::~Board(){}
 
+Piece Board::operator[](int index) const{
+    return table[index];
+}
+
 std::list<Move> Board::getPotentialMove() const{
     std::list<Move> res(0);
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
-            std::list<Move> moveForThisPiece = table[i].getMove(table);
-            for (auto j = moveForThisPiece.begin(); j != moveForThisPiece.end(); j++){
-                res.push_front(*j);
+            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table);
+            for (auto j = deplacementForThisPiece.begin(); j != deplacementForThisPiece.end(); j++){
+                res.push_front(this->constructMove(table[i], *j));
             }
         }
     }
@@ -77,6 +81,9 @@ void Board::computeMove(Move m){
     for (auto i = newPieces.begin(); i!= newPieces.end(); i++){
         table[getIndex(i->getPosX(), i->getPosY())] = *i; // get the new pieces on the board
     }
+    //change flags
+    flags = m.getNewFlags();
+
     //change turn
     switch(turn){
     case 'W':
@@ -89,7 +96,7 @@ void Board::computeMove(Move m){
 }
 
 void Board::unComputeMove(Move m){
-    Move reversedMove(m.getNewPieces(), m.getOldPieces(), "");
+    Move reversedMove = Move(m.getNewPieces(),m.getOldPieces(),m.getNewFlags(),m.getOldFlags(), "");
     this->computeMove(reversedMove);
 }
 
@@ -110,7 +117,6 @@ bool Board::kingIsPending(){
         }
     }
     return res;
-
 }
 
 bool Board::isLegal(Move m){
@@ -120,3 +126,38 @@ bool Board::isLegal(Move m){
     return res;
 }
 
+Move Board::constructMove(Piece movingPiece, deplacement depl) const{
+    std::string columns = "abcdefgh";
+    std::string rows = "123456789";
+
+    std::list<Piece> oldPieces({movingPiece});
+    std::list<Piece> newPieces({movingPiece.deplacePiece(depl)});
+    boardFlags oldFlags = {-1};
+    boardFlags newFlags = {-1};
+    std::string notation = "";
+
+    notation = notation + movingPiece.getKind();
+    notation = notation + columns[movingPiece.getPosX()];
+    notation = notation + rows[movingPiece.getPosY()];
+
+    int destinationIndex = getIndex(depl.destinationX, depl.destinationY);
+    if (table[destinationIndex].getColor() != '_'){
+        oldPieces.push_front(table[destinationIndex]);
+        notation = notation + 'x';
+    }
+    notation = notation + columns[depl.destinationX];
+    notation = notation + rows[depl.destinationY];
+    if (depl.tag == PromotionMoveQ){
+        notation = notation + "=Q";
+    }
+    else if (depl.tag == PromotionMoveB){
+        notation = notation + "=B";
+    }
+    else if (depl.tag == PromotionMoveR){
+        notation = notation + "=R";
+    }
+    else if (depl.tag == PromotionMoveN){
+        notation = notation + "=N";
+    }
+    return Move(oldPieces, newPieces, oldFlags, newFlags, notation);
+}

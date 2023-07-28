@@ -31,7 +31,7 @@ int main(int argc, char** argv)
       std::ofstream myFile("./games/" + folderToSaveGame + "/game" + std::to_string(i) + ".pgn");
       partie.write(myFile);
       myFile.close();
-      std::cout << "Game " + std::to_string(i) << " played. Made "<< partie.getNMovedPlayed() << " moves. Result: " << partie.getResult() <<  std::endl;
+      std::cout << "Game " + std::to_string(i+1) << " played out of "<< std::to_string(NGame) << ". Made "<< partie.getNMovedPlayed() << " moves. Result: " << partie.getResult() <<  std::endl;
     }
   return 0;
 }

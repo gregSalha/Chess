@@ -7,6 +7,14 @@ std::list<Piece> Move::getOldPieces() const{
     return oldPieces;
 }
 
+boardFlags Move::getOldFlags() const{
+    return oldFlags;
+}
+
+boardFlags Move::getNewFlags() const{
+    return newFlags;
+}
+
 std::string Move::getNotation() const{
     return notation;
 }

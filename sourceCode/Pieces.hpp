@@ -7,6 +7,7 @@
 #include <ostream>
 
 #include "indexHandler.hpp"
+#include "deplacement.hpp"
 
 class Move;
 
@@ -31,17 +32,15 @@ public:
     char getKind() const{return(kind);};
 
     //generic explorers
-    void exploreCardinalDirections(std::list<std::pair<int, int>> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
-    void exploreFixedPositions(std::list<std::pair<int, int>> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
+    void exploreCardinalDirections(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
+    void exploreFixedPositions(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
+
+    Piece deplacePiece(deplacement depl) const;
 
     //Renvoie les la liste des mouvements possibles pour cette piece
-    std::list<Move> getMove(const std::vector<Piece> & table) const;
-    std::list<std::pair<int, int>> getStandardDeplacement(const std::vector<Piece> & table) const;
-    std::list<Move> getPromotionMove(const std::vector<Piece> & table, char promotedKind) const;
+    std::list<deplacement> getDeplacement(const std::vector<Piece> & table) const;
 
     friend void operator<<(std::ostream & flux, const Piece & piece);
-    Piece movePiece(int destinationX, int destinationY);
-    Move standardMove(int destinationX, int destinationY, const std::vector<Piece> & table) const;
 };
 
 

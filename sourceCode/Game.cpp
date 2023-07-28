@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include <iostream>
 
 
 void Game::write(std::ostream & flux){
@@ -34,7 +35,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 nextMove = whiteIA.getNextMove(G, currentPosition);
             }
             catch(int errorCode){
-                Move passTurn({}, {}, "");
+                Move passTurn;
                 currentPosition.computeMove(passTurn);
                 if (currentPosition.kingIsPending()){
                     result = 'B';
@@ -48,7 +49,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 nextMove = blackIA.getNextMove(G, currentPosition);
             }
             catch(int errorCode){
-                Move passTurn({}, {}, "");
+                Move passTurn;
                 currentPosition.computeMove(passTurn);
                 if (currentPosition.kingIsPending()){
                     result = 'W';
