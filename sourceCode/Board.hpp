@@ -21,13 +21,14 @@ public:
 
     //accesseurs
     char getTurn() const{return turn;};
+    boardFlags getFlags() const{return flags;};
     Piece operator[](int index) const;
 
-    void computeMove(Move m);
-    void unComputeMove(Move m);
+    void computeMove(const Move & m);
+    void unComputeMove(const Move & m);
 
     bool kingIsPending();
-    bool isLegal(Move m);
+    bool isLegal(const Move & m);
 
     Move constructMove(Piece movingPiece, deplacement depl) const;
 

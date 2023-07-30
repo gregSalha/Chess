@@ -8,6 +8,7 @@
 
 #include "indexHandler.hpp"
 #include "deplacement.hpp"
+#include "boardFlags.hpp"
 
 class Move;
 
@@ -38,7 +39,7 @@ public:
     Piece deplacePiece(deplacement depl) const;
 
     //Renvoie les la liste des mouvements possibles pour cette piece
-    std::list<deplacement> getDeplacement(const std::vector<Piece> & table) const;
+    std::list<deplacement> getDeplacement(const std::vector<Piece> & table, boardFlags flags) const;
 
     friend void operator<<(std::ostream & flux, const Piece & piece);
 };

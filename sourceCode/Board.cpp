@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-Board::Board(): table(64), turn('W'), flags({-1}){
+Board::Board(): table(64), turn('W'), flags(-1){
 
     //Pawn creation
     for (int i = 0; i<8; i++){
@@ -40,7 +40,7 @@ Board::Board(): table(64), turn('W'), flags({-1}){
 
 }
 
-Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn){}
+Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn), flags(_Board.flags){}
 
 Board::~Board(){}
 
@@ -52,7 +52,7 @@ std::list<Move> Board::getPotentialMove() const{
     std::list<Move> res(0);
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
-            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table);
+            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
             for (auto j = deplacementForThisPiece.begin(); j != deplacementForThisPiece.end(); j++){
                 res.push_front(this->constructMove(table[i], *j));
             }
@@ -72,7 +72,7 @@ std::list<Move> Board::getLegalMove(){
     return res;
 }
 
-void Board::computeMove(Move m){
+void Board::computeMove(const Move & m){
     std::list<Piece> oldPieces = m.getOldPieces();
     std::list<Piece> newPieces = m.getNewPieces();
     for (auto i = oldPieces.begin(); i!=oldPieces.end(); i++){
@@ -95,8 +95,8 @@ void Board::computeMove(Move m){
     }
 }
 
-void Board::unComputeMove(Move m){
-    Move reversedMove = Move(m.getNewPieces(),m.getOldPieces(),m.getNewFlags(),m.getOldFlags(), "");
+void Board::unComputeMove(const Move & m){
+    Move reversedMove(m.getNewPieces(),m.getOldPieces(),m.getNewFlags(),m.getOldFlags(), "");
     this->computeMove(reversedMove);
 }
 
@@ -119,7 +119,7 @@ bool Board::kingIsPending(){
     return res;
 }
 
-bool Board::isLegal(Move m){
+bool Board::isLegal(const Move & m){
     this->computeMove(m);
     bool res = !(this->kingIsPending());
     this->unComputeMove(m);
@@ -129,35 +129,50 @@ bool Board::isLegal(Move m){
 Move Board::constructMove(Piece movingPiece, deplacement depl) const{
     std::string columns = "abcdefgh";
     std::string rows = "123456789";
-
+    
     std::list<Piece> oldPieces({movingPiece});
     std::list<Piece> newPieces({movingPiece.deplacePiece(depl)});
-    boardFlags oldFlags = {-1};
-    boardFlags newFlags = {-1};
+    boardFlags oldFlags = flags;
+    boardFlags newFlags(-1);
+    if (depl.getTag() == PawnFirstJump){
+        newFlags = {movingPiece.getPosX()};
+    }
     std::string notation = "";
 
     notation = notation + movingPiece.getKind();
     notation = notation + columns[movingPiece.getPosX()];
     notation = notation + rows[movingPiece.getPosY()];
 
-    int destinationIndex = getIndex(depl.destinationX, depl.destinationY);
+    int destinationIndex = getIndex(depl.getDestinationX(), depl.getDestinationY());
     if (table[destinationIndex].getColor() != '_'){
         oldPieces.push_front(table[destinationIndex]);
         notation = notation + 'x';
     }
-    notation = notation + columns[depl.destinationX];
-    notation = notation + rows[depl.destinationY];
-    if (depl.tag == PromotionMoveQ){
+    if (depl.getTag()==enPassant){
+        notation = notation + 'x';
+        int eatenPawnPositionX = depl.getDestinationX();
+        int eatenPawnPositionY = depl.getDestinationY()-1;
+        if (movingPiece.getColor()=='B'){
+            eatenPawnPositionY = depl.getDestinationY()+1;
+        }
+        oldPieces.push_front(table[getIndex(eatenPawnPositionX, eatenPawnPositionY)]);
+    }
+    notation = notation + columns[depl.getDestinationX()];
+    notation = notation + rows[depl.getDestinationY()];
+    if (depl.getTag() == PromotionMoveQ){
         notation = notation + "=Q";
     }
-    else if (depl.tag == PromotionMoveB){
+    else if (depl.getTag() == PromotionMoveB){
         notation = notation + "=B";
     }
-    else if (depl.tag == PromotionMoveR){
+    else if (depl.getTag() == PromotionMoveR){
         notation = notation + "=R";
     }
-    else if (depl.tag == PromotionMoveN){
+    else if (depl.getTag() == PromotionMoveN){
         notation = notation + "=N";
+    }
+    else if (depl.getTag() == enPassant){
+        notation = notation + "e.p.";
     }
     return Move(oldPieces, newPieces, oldFlags, newFlags, notation);
 }

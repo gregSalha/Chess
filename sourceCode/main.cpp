@@ -23,7 +23,6 @@ int main(int argc, char** argv)
     std::system(("mkdir -p ./games/" + folderToSaveGame).c_str());
     std::mt19937_64 G(std::time(NULL));
     for (int i = 0; i<NGame; i++){
-      Board startingPos;
       randomIA whiteIA('W');
       randomIA blackIA('B');
       Game partie;

@@ -41,7 +41,7 @@ void Piece::exploreFixedPositions(std::list<deplacement> & res, const std::vecto
     }
 }
 
-std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table) const{
+std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, boardFlags flags) const{
     std::list<deplacement> res(0);
     switch(kind){
         case 'P':{
@@ -71,6 +71,11 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table) c
             if (posY == 1 + 5*(1-codeCouleur)/2){
                 if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_' && table[getIndex(posX, posY+2*codeCouleur)].getKind() == '_'){
                     res.push_front({posX, posY+2*codeCouleur, PawnFirstJump});
+                }
+            }
+            if (flags.getEnPassantFlag() != -1 && 2*posY == 7 + codeCouleur){
+                if (posX==flags.getEnPassantFlag()-1 || posX==flags.getEnPassantFlag()+1){
+                    res.push_front({flags.getEnPassantFlag(), posY + codeCouleur, enPassant});
                 }
             }
         }
@@ -106,21 +111,21 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table) c
 
 
 Piece Piece::deplacePiece(deplacement depl) const{
-    switch(depl.tag){
+    switch(depl.getTag()){
         case PromotionMoveQ:{
-            return Piece(depl.destinationX, depl.destinationY, color, 'Q');
+            return Piece(depl.getDestinationX(), depl.getDestinationY(), color, 'Q');
         }
         case PromotionMoveB:{
-            return Piece(depl.destinationX, depl.destinationY, color, 'B');
+            return Piece(depl.getDestinationX(), depl.getDestinationY(), color, 'B');
         }
         case PromotionMoveN:{
-            return Piece(depl.destinationX, depl.destinationY, color, 'N');
+            return Piece(depl.getDestinationX(), depl.getDestinationY(), color, 'N');
         }
         case PromotionMoveR:{
-            return Piece(depl.destinationX, depl.destinationY, color, 'R');
+            return Piece(depl.getDestinationX(), depl.getDestinationY(), color, 'R');
         }
         default:{
-            return Piece(depl.destinationX, depl.destinationY, color, kind);
+            return Piece(depl.getDestinationX(), depl.getDestinationY(), color, kind);
         }
     }
 }
