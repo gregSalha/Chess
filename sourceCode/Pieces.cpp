@@ -17,12 +17,12 @@ void Piece::exploreCardinalDirections(std::list<deplacement> & res, const std::v
             else{
                 if (table[getIndex(currentX, currentY)].getColor()!='_'){
                     if (table[getIndex(currentX, currentY)].getColor()!=color){
-                        res.push_front({currentX, currentY, Standard});
+                        res.push_front(deplacement(currentX, currentY, Standard));
                     }
                     break;
                 }
                 else{
-                    res.push_front({currentX, currentY, Standard});
+                    res.push_front(deplacement(currentX, currentY, Standard));
                 }
             }
         }
@@ -35,7 +35,7 @@ void Piece::exploreFixedPositions(std::list<deplacement> & res, const std::vecto
         int currentY = posY + pos->second;
         if (currentX>=0 && currentX<8 && currentY>=0 && currentY<8){
             if (table[getIndex(currentX, currentY)].getColor()!=color){
-                res.push_front({currentX, currentY, Standard});
+                res.push_front(deplacement(currentX, currentY, Standard));
             }
         }
     }
@@ -55,27 +55,27 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
             }
             for (auto tag= tags.begin(); tag != tags.end(); tag++){
                 if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_'){
-                    res.push_front({posX, posY+codeCouleur, *tag});
+                    res.push_front(deplacement(posX, posY+codeCouleur, *tag));
                 }
                 if (posX>0){
                     if (table[getIndex(posX-1, posY+codeCouleur)].getColor() != color && table[getIndex(posX-1, posY+codeCouleur)].getColor() != '_'){
-                        res.push_front({posX-1, posY+codeCouleur, *tag});
+                        res.push_front(deplacement(posX-1, posY+codeCouleur, *tag));
                     }
                 }
                 if (posX<7){
                     if (table[getIndex(posX+1, posY+codeCouleur)].getColor() != color && table[getIndex(posX+1, posY+codeCouleur)].getColor() != '_'){
-                        res.push_front({posX+1, posY+codeCouleur, *tag});
+                        res.push_front(deplacement(posX+1, posY+codeCouleur, *tag));
                     }
                 }
             }
             if (posY == 1 + 5*(1-codeCouleur)/2){
                 if (table[getIndex(posX, posY+codeCouleur)].getKind() == '_' && table[getIndex(posX, posY+2*codeCouleur)].getKind() == '_'){
-                    res.push_front({posX, posY+2*codeCouleur, PawnFirstJump});
+                    res.push_front(deplacement(posX, posY+2*codeCouleur, PawnFirstJump));
                 }
             }
             if (flags.getEnPassantFlag() != -1 && 2*posY == 7 + codeCouleur){
                 if (posX==flags.getEnPassantFlag()-1 || posX==flags.getEnPassantFlag()+1){
-                    res.push_front({flags.getEnPassantFlag(), posY + codeCouleur, enPassant});
+                    res.push_front(deplacement(flags.getEnPassantFlag(), posY + codeCouleur, enPassant));
                 }
             }
         }
@@ -128,4 +128,8 @@ Piece Piece::deplacePiece(deplacement depl) const{
             return Piece(depl.getDestinationX(), depl.getDestinationY(), color, kind);
         }
     }
+}
+
+bool operator==(Piece const & piece1, Piece const & piece2){
+    return (piece1.posX==piece2.posX)&&(piece1.posY==piece2.posY)&&(piece1.kind==piece2.kind)&&(piece1.color==piece2.color);
 }

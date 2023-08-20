@@ -42,7 +42,10 @@ public:
     std::list<deplacement> getDeplacement(const std::vector<Piece> & table, boardFlags flags) const;
 
     friend void operator<<(std::ostream & flux, const Piece & piece);
+    friend bool operator==(Piece const & l, Piece const & r);
 };
+
+
 
 
 #endif // PIECES_HPP_INCLUDED

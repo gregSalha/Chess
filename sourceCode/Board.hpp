@@ -30,6 +30,8 @@ public:
     bool kingIsPending();
     bool isLegal(const Move & m);
 
+    std::string constructNotation(Piece movingPiece, deplacement depl) const;
+    boardFlags constructFlags(Piece movingPiece, deplacement depl) const;
     Move constructMove(Piece movingPiece, deplacement depl) const;
 
     std::list<Move> getPotentialMove() const;

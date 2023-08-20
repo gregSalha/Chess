@@ -1,6 +1,6 @@
 #include <string>
 
-typedef enum {Standard, PawnFirstJump, enPassant, PromotionMoveQ, PromotionMoveR, PromotionMoveB, PromotionMoveN} deplacementTag;
+typedef enum {Standard, PawnFirstJump, enPassant, PromotionMoveQ, PromotionMoveR, PromotionMoveB, PromotionMoveN, bigRockWhite,smallRockWhite, smallRockBlack, bigRockBlack} deplacementTag;
 
 class deplacement{
     private:

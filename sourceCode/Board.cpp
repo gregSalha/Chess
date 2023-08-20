@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-Board::Board(): table(64), turn('W'), flags(-1){
+Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1){
 
     //Pawn creation
     for (int i = 0; i<8; i++){
@@ -126,22 +126,78 @@ bool Board::isLegal(const Move & m){
     return res;
 }
 
+std::string Board::constructNotation(Piece movingPiece, deplacement depl) const{
+    if (depl.getTag() == bigRockWhite || depl.getTag() == bigRockBlack){
+        return "O-O-O";
+    }
+    else if (depl.getTag() == smallRockWhite || depl.getTag() == smallRockBlack){
+        return "O-O";
+    }
+    else{
+        std::string columns = "abcdefgh";
+        std::string rows = "123456789";
+        std::string notation = "";
+        notation = notation + movingPiece.getKind();
+        notation = notation + columns[movingPiece.getPosX()];
+        notation = notation + rows[movingPiece.getPosY()];
+        int destinationIndex = getIndex(depl.getDestinationX(), depl.getDestinationY());
+        if (table[destinationIndex].getColor() != '_'){
+            notation = notation + 'x';
+        }
+        notation = notation + columns[depl.getDestinationX()];
+        notation = notation + rows[depl.getDestinationY()];
+        if (depl.getTag() == PromotionMoveQ){
+            notation = notation + "=Q";
+        }
+        else if (depl.getTag() == PromotionMoveB){
+            notation = notation + "=B";
+        }
+        else if (depl.getTag() == PromotionMoveR){
+            notation = notation + "=R";
+        }
+        else if (depl.getTag() == PromotionMoveN){
+            notation = notation + "=N";
+        }
+        return notation;
+    }
+}
+
+boardFlags Board::constructFlags(Piece movingPiece, deplacement depl) const{
+    int newEnPassantMove = -1;
+    int newBigRockWhite = flags.getBigRockWhite();
+    int newSmallRockWhite = flags.getSmallRockWhite();
+    int newBigRockBlack = flags.getBigRockBlack();
+    int newSmallRockBlack = flags.getSmallRockBlack();
+
+    if (depl.getTag() == PawnFirstJump){
+        newEnPassantMove = movingPiece.getPosX();
+    } 
+
+    if (movingPiece == Piece(0, 0, 'W', 'R')  || movingPiece == Piece(4, 0, 'W', 'K')){
+        newBigRockWhite = -1;
+    }
+    if (movingPiece == Piece(7, 0, 'W', 'R')  || movingPiece == Piece(4, 0, 'W', 'K')){
+        newSmallRockWhite = -1;
+    }
+    if (movingPiece == Piece(0, 7, 'B', 'R')  || movingPiece == Piece(4, 0, 'B', 'K')){
+        newBigRockBlack = -1;
+    }
+    if (movingPiece == Piece(7, 7, 'B', 'R')  || movingPiece == Piece(4, 0, 'B', 'K')){
+        newSmallRockBlack = -1;
+    }
+    return boardFlags(newEnPassantMove, newBigRockWhite, newSmallRockWhite, newBigRockBlack, newSmallRockBlack);
+}
+
 Move Board::constructMove(Piece movingPiece, deplacement depl) const{
-    std::string columns = "abcdefgh";
-    std::string rows = "123456789";
     
     std::list<Piece> oldPieces({movingPiece});
     std::list<Piece> newPieces({movingPiece.deplacePiece(depl)});
-    boardFlags oldFlags = flags;
-    boardFlags newFlags(-1);
-    if (depl.getTag() == PawnFirstJump){
-        newFlags = {movingPiece.getPosX()};
-    }
-    std::string notation = "";
 
+    boardFlags newFlags = this->constructFlags(movingPiece, depl);
+
+    std::string notation("");
     notation = notation + movingPiece.getKind();
-    notation = notation + columns[movingPiece.getPosX()];
-    notation = notation + rows[movingPiece.getPosY()];
+    notation = notation + getNotationFromCoord(movingPiece.getPosX(), movingPiece.getPosY());
 
     int destinationIndex = getIndex(depl.getDestinationX(), depl.getDestinationY());
     if (table[destinationIndex].getColor() != '_'){
@@ -157,22 +213,6 @@ Move Board::constructMove(Piece movingPiece, deplacement depl) const{
         }
         oldPieces.push_front(table[getIndex(eatenPawnPositionX, eatenPawnPositionY)]);
     }
-    notation = notation + columns[depl.getDestinationX()];
-    notation = notation + rows[depl.getDestinationY()];
-    if (depl.getTag() == PromotionMoveQ){
-        notation = notation + "=Q";
-    }
-    else if (depl.getTag() == PromotionMoveB){
-        notation = notation + "=B";
-    }
-    else if (depl.getTag() == PromotionMoveR){
-        notation = notation + "=R";
-    }
-    else if (depl.getTag() == PromotionMoveN){
-        notation = notation + "=N";
-    }
-    else if (depl.getTag() == enPassant){
-        notation = notation + "e.p.";
-    }
-    return Move(oldPieces, newPieces, oldFlags, newFlags, notation);
+    notation = notation + getNotationFromCoord(depl.getDestinationX(), depl.getDestinationY());
+    return Move(oldPieces, newPieces, flags, newFlags, notation);
 }
