@@ -172,17 +172,16 @@ boardFlags Board::constructFlags(Piece movingPiece, deplacement depl) const{
     if (depl.getTag() == PawnFirstJump){
         newEnPassantMove = movingPiece.getPosX();
     } 
-
     if (movingPiece == Piece(0, 0, 'W', 'R')  || movingPiece == Piece(4, 0, 'W', 'K')){
         newBigRockWhite = -1;
     }
     if (movingPiece == Piece(7, 0, 'W', 'R')  || movingPiece == Piece(4, 0, 'W', 'K')){
         newSmallRockWhite = -1;
     }
-    if (movingPiece == Piece(0, 7, 'B', 'R')  || movingPiece == Piece(4, 0, 'B', 'K')){
+    if (movingPiece == Piece(0, 7, 'B', 'R')  || movingPiece == Piece(4, 7, 'B', 'K')){
         newBigRockBlack = -1;
     }
-    if (movingPiece == Piece(7, 7, 'B', 'R')  || movingPiece == Piece(4, 0, 'B', 'K')){
+    if (movingPiece == Piece(7, 7, 'B', 'R')  || movingPiece == Piece(4, 7, 'B', 'K')){
         newSmallRockBlack = -1;
     }
     return boardFlags(newEnPassantMove, newBigRockWhite, newSmallRockWhite, newBigRockBlack, newSmallRockBlack);
@@ -195,14 +194,11 @@ Move Board::constructMove(Piece movingPiece, deplacement depl) const{
 
     boardFlags newFlags = this->constructFlags(movingPiece, depl);
 
-    std::string notation("");
-    notation = notation + movingPiece.getKind();
-    notation = notation + getNotationFromCoord(movingPiece.getPosX(), movingPiece.getPosY());
+    std::string notation=constructNotation(movingPiece, depl);
 
     int destinationIndex = getIndex(depl.getDestinationX(), depl.getDestinationY());
     if (table[destinationIndex].getColor() != '_'){
         oldPieces.push_front(table[destinationIndex]);
-        notation = notation + 'x';
     }
     if (depl.getTag()==enPassant){
         notation = notation + 'x';
@@ -213,6 +209,65 @@ Move Board::constructMove(Piece movingPiece, deplacement depl) const{
         }
         oldPieces.push_front(table[getIndex(eatenPawnPositionX, eatenPawnPositionY)]);
     }
-    notation = notation + getNotationFromCoord(depl.getDestinationX(), depl.getDestinationY());
+    if (depl.getTag()==bigRockWhite){
+        oldPieces.push_front(table[getIndex(0,0)]);
+        newPieces.push_front(Piece(3, 0, 'W', 'R'));
+    }
+    if (depl.getTag()==smallRockWhite){
+        oldPieces.push_front(table[getIndex(7,0)]);
+        newPieces.push_front(Piece(5, 0, 'W', 'R'));
+    }
+     if (depl.getTag()==bigRockBlack){
+        oldPieces.push_front(table[getIndex(0,7)]);
+        newPieces.push_front(Piece(3, 7, 'B', 'R'));
+    }
+    if (depl.getTag()==smallRockBlack){
+        oldPieces.push_front(table[getIndex(7,7)]);
+        newPieces.push_front(Piece(5, 7, 'B', 'R'));
+    }
     return Move(oldPieces, newPieces, flags, newFlags, notation);
+}
+
+std::string Board::getFENNotation() const{
+    std::string res("");
+    for (int j = 7; j>=0; j--){
+        int emptyCaseCounter = 0;
+        for (int i = 0; i<8; i++){
+            if (table[getIndex(i,j)].getKind()=='_'){
+                emptyCaseCounter++;
+                if (i==7){
+                    res = res + std::to_string(emptyCaseCounter);
+                }
+            }
+            else{
+                if (emptyCaseCounter!=0){
+                    res = res + std::to_string(emptyCaseCounter);
+                }
+                if (table[getIndex(i, j)].getColor()=='W'){
+                    res.push_back(table[getIndex(i, j)].getKind());
+                }
+                else{
+                    res.push_back(std::tolower(table[getIndex(i, j)].getKind()));
+                }
+                emptyCaseCounter = 0;
+            }
+        }
+        res.push_back('/');
+    }
+    res.pop_back();
+    res = res + " " + turn + " ";
+    if (flags.getSmallRockWhite()==1){
+        res.push_back('K');
+    }
+    if (flags.getBigRockWhite()==1){
+        res.push_back('Q');
+    }
+    if (flags.getSmallRockBlack()==1){
+        res.push_back('k');
+    }
+    if (flags.getBigRockBlack()==1){
+        res.push_back('q');
+    }
+
+    return res;
 }

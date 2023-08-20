@@ -23,7 +23,8 @@ public:
     void save() const;
     void play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA);
 
-    void write(std::ostream & flux);
+    //void write(std::ostream & flux);
+    void write(std::string placeToSave);
 };
 
 #endif // GAME_HPP_INCLUDED

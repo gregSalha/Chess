@@ -2,7 +2,8 @@
 #include <iostream>
 
 
-void Game::write(std::ostream & flux){
+void Game::write(std::string placeToSave){
+    std::ofstream flux(placeToSave + "/pgnFile.pgn");
     flux << "[Event \"Game from Gregoire Salha Chess Engine\"]\n";
     flux << "[Site \"Zurich\"]\n";
     auto t = std::time(nullptr);
@@ -24,6 +25,15 @@ void Game::write(std::ostream & flux){
     }
     for (auto i = moveRecord.begin(); i != moveRecord.end(); i++){
         flux << i->getNotation() << ' ';
+    }
+    flux.close();
+    std::ofstream flux2(placeToSave + "/fenFile.txt");
+    Board replayBoard(startingPosition);
+    int counter = 0;
+    for (auto i = moveRecord.begin(); i != moveRecord.end(); i++){
+        flux2 << std::to_string(counter) << replayBoard.getFENNotation() << std::endl;
+        counter++;
+        replayBoard.computeMove(*i);
     }
 }
 
@@ -57,6 +67,9 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 currentPosition.unComputeMove(passTurn);
                 break;
             }
+        }
+        if (nextMove.getNotation()[0]=='O'){
+            std::cout<<"Rocked here"<<std::endl;
         }
         moveRecord.push_back(nextMove);
         currentPosition.computeMove(nextMove);

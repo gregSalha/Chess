@@ -27,9 +27,8 @@ int main(int argc, char** argv)
       randomIA blackIA('B');
       Game partie;
       partie.play(G, NMove, whiteIA, blackIA);
-      std::ofstream myFile("./games/" + folderToSaveGame + "/game" + std::to_string(i) + ".pgn");
-      partie.write(myFile);
-      myFile.close();
+      std::system(("mkdir -p ./games/" + folderToSaveGame + "/game" + std::to_string(i)).c_str());
+      partie.write("./games/" + folderToSaveGame + "/game" + std::to_string(i));
       std::cout << "Game " + std::to_string(i+1) << " played out of "<< std::to_string(NGame) << ". Made "<< partie.getNMovedPlayed() << " moves. Result: " << partie.getResult() <<  std::endl;
     }
   return 0;

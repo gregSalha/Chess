@@ -98,6 +98,58 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
         case 'K':{
             std::list<std::pair<int, int>> positionsToExplore({{1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}, {1, 0}});
             exploreFixedPositions(res, table, positionsToExplore);
+            if (color=='W'){
+                if (flags.getBigRockWhite()==1){
+                    bool canRock(true);
+                    for (int i=0; i<3; i++){
+                        if (table[getIndex(3-i, 0)].getKind()!='_'){
+                            canRock = false;
+                            break;
+                        }
+                    }
+                    if (canRock){
+                            res.push_front(deplacement(2, 0, bigRockWhite));
+                    }
+                }
+                if (flags.getSmallRockWhite()==1){ 
+                    bool canRock(true);
+                    for (int i=0; i<2; i++){
+                        if (table[getIndex(5+i, 0)].getKind()!='_'){
+                            canRock = false;
+                            break;
+                        }
+                    }
+                if (canRock){
+                    res.push_front(deplacement(6, 0, smallRockWhite));
+                }
+                }
+            }
+            else{
+                if (flags.getBigRockBlack()==1){
+                    bool canRock(false);
+                    for (int i=0; i<3; i++){
+                        if (table[getIndex(3-i, 7)].getKind()!='_'){
+                            canRock = false;
+                            break;
+                        }
+                    }
+                    if (canRock){
+                        res.push_front(deplacement(2, 7, bigRockBlack));
+                    }
+                }
+                if (flags.getSmallRockBlack()==1){ 
+                    bool canRock(true);
+                    for (int i=0; i<2; i++){
+                        if (table[getIndex(5+i, 7)].getKind()!='_'){
+                            canRock = false;
+                            break;
+                        }
+                    }
+                    if (canRock){
+                        res.push_front(deplacement(6, 7, smallRockBlack));
+                    }
+                }
+            }
         }
         break;
         case 'N':{

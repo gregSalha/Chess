@@ -1,6 +1,7 @@
 #ifndef BOARD_HPP_INCLUDED
 #define BOARD_HPP_INCLUDED
 #include <vector>
+#include <cctype>
 
 #include"Pieces.hpp"
 #include"Move.hpp"
@@ -33,6 +34,8 @@ public:
     std::string constructNotation(Piece movingPiece, deplacement depl) const;
     boardFlags constructFlags(Piece movingPiece, deplacement depl) const;
     Move constructMove(Piece movingPiece, deplacement depl) const;
+
+    std::string getFENNotation() const;
 
     std::list<Move> getPotentialMove() const;
     std::list<Move> getLegalMove();
