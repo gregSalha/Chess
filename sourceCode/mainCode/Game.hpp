@@ -18,6 +18,7 @@ private:
     std::list<Move> moveRecord;
 public:
     Game(): startingPosition(), currentPosition(), result('D'), nMovedPlayed(0), moveRecord(0){};
+    Game(const Board& startPos): startingPosition(startPos), currentPosition(startPos), result('D'), nMovedPlayed(0), moveRecord(0){}; 
     char getResult() const;
     int getNMovedPlayed() const;
     void save() const;

@@ -25,7 +25,15 @@ int main(int argc, char** argv)
     for (int i = 0; i<NGame; i++){
       randomIA whiteIA('W');
       randomIA blackIA('B');
-      Game partie;
+      std::string fenString = "4k2r/6r1/8/8/8/8/3R4/R3K3 W Qk - 0";
+      Board startingPos;
+      if (startingPos.loadFEN(fenString)){
+        std::cout<<"Loading of fen successfull"<<std::endl;
+      }
+      else{
+        std::cout<<"Loading of fen failed"<<std::endl;
+      }
+      Game partie(startingPos);
       partie.play(G, NMove, whiteIA, blackIA);
       std::system(("mkdir -p ./games/" + folderToSaveGame + "/game" + std::to_string(i)).c_str());
       partie.write("./games/" + folderToSaveGame + "/game" + std::to_string(i));

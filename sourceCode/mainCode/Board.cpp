@@ -3,7 +3,152 @@
 
 #include <algorithm>
 
+bool Board::loadFEN(std::string fenNotation){
 
+    if (fenNotation.find(" ") ==std::string::npos){
+        return false;
+    };
+    std::string tableInfo = fenNotation.substr(0, fenNotation.find(" "));
+    std::cout<<tableInfo<<std::endl;
+    fenNotation.erase(0, fenNotation.find(" ")+1);
+
+    if (fenNotation.find(" ") ==std::string::npos){
+        return false;
+    };
+    std::string colorInfo = fenNotation.substr(0, fenNotation.find(" "));
+    std::cout<<colorInfo<<std::endl;
+    fenNotation.erase(0, fenNotation.find(" ")+1);
+
+    if (fenNotation.find(" ") ==std::string::npos){
+        return false;
+    };
+    std::string rockInfo = fenNotation.substr(0, fenNotation.find(" "));
+    std::cout<<rockInfo<<std::endl;
+    fenNotation.erase(0, fenNotation.find(" ")+1);
+
+    if (fenNotation.find(" ") ==std::string::npos){
+        return false;
+    };
+    std::string enPassantInfo = fenNotation.substr(0, fenNotation.find(" "));
+    std::cout<<enPassantInfo<<std::endl;
+    fenNotation.erase(0, fenNotation.find(" ")+1);
+
+
+
+    std::list<std::string> linePosList={};
+    for (int i = 0; i<7; i++){
+        if (tableInfo.find("/") ==std::string::npos){
+            return false;
+        };
+        linePosList.push_front(tableInfo.substr(0, tableInfo.find("/")));
+        tableInfo.erase(0, tableInfo.find("/")+1);
+    }
+    linePosList.push_front(tableInfo);
+
+    std::list<char> acceptableChar = {'p', 'r', 'q', 'k', 'n', 'b','P', 'R', 'Q', 'K', 'N', 'B'};
+    for (auto s = linePosList.begin(); s!=linePosList.end(); s++){
+        std::string currentLine = *s;
+        std::cout<<"Considering line " << currentLine << std::endl;
+        int counter=0;
+        for (int j = 0; j<currentLine.length(); j++){
+            std::cout<<"Doing char " << j << " counter at " << counter << std::endl;
+            if(std::isdigit(currentLine[j])){
+                counter = counter + int(currentLine[j]) - 48;
+            }
+            else{
+                bool acceptable = false;
+                for (auto k = acceptableChar.begin(); k != acceptableChar.end(); k++){
+                    if (*k==currentLine[j]){
+                        acceptable = true;
+                        break;
+                    }
+                }
+                if (acceptable){
+                    counter = counter + 1;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        if (counter != 8){
+            return false;
+        }
+    }
+    std::cout<<"Passed table check"<<std::endl;
+
+    if (colorInfo != "W" and colorInfo != "B"){
+        return false;
+    }
+    std::cout<<"Passed color"<<std::endl;
+
+    if (rockInfo.length() > 4){
+        return false;
+    }
+    for (int i = 0; i< rockInfo.length(); i++){
+        if (rockInfo[i] != 'K' and rockInfo[i] != 'Q' and rockInfo[i] != 'k' and rockInfo[i] != 'q'){
+            return false;
+        }
+    }
+    std::cout<<"Passed rock info"<<std::endl;
+
+    acceptableChar = {'-','1', '2', '3', '4', '5', '6', '7', '8'};
+    bool acceptable = false;
+    if (enPassantInfo.length() != 1){
+        return false;
+    }
+    for (auto s = acceptableChar.begin(); s!= acceptableChar.end(); s++){
+        if (enPassantInfo[0] == *s){
+            acceptable = true;
+            break;
+        }
+    }
+    if (!acceptable){
+        return false;
+    }
+    std::cout<<"Passed en passant"<<std::endl;
+
+    int posY = 0;
+    for (auto line = linePosList.begin(); line != linePosList.end(); line++){
+        std::string currentLine = *line;
+        int posX = 0; 
+        for (int i = 0; i<line->length(); i++){
+            if (std::isdigit(currentLine[i])){
+                posX = posX + int(currentLine[i])-48;
+            }
+            else{
+                char Color = 'W';
+                if (!std::isupper(currentLine[i])){
+                    Color = 'B';
+                }
+                table[getIndex(posX, posY)] = Piece(posX, posY, Color, std::toupper(currentLine[i]));
+                posX = posX+1;
+            }
+        }
+        posY = posY+1;
+    }
+    turn = colorInfo[0];
+    std::vector<int> newFlag= {-1, -1, -1, -1, -1};
+    for (int i = 0; i<rockInfo.length(); i++){
+        if (rockInfo[i] == 'Q'){
+            newFlag[1] = 1;
+        } 
+        if (rockInfo[i] == 'K'){
+            newFlag[2] = 1;
+        } 
+        if (rockInfo[i] == 'q'){
+            newFlag[3] = 1;
+        } 
+        if (rockInfo[i] == 'k'){
+            newFlag[4] = 1;
+        } 
+    }
+    if (enPassantInfo!="-"){
+        newFlag[0] = std::stoi(enPassantInfo);
+    }
+    flags = boardFlags(newFlag[0], newFlag[1], newFlag[2], newFlag[3], newFlag[4]);
+    return true;
+}
 Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1){
 
     //Pawn creation

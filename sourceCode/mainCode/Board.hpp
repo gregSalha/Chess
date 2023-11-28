@@ -25,6 +25,8 @@ public:
     boardFlags getFlags() const{return flags;};
     Piece operator[](int index) const;
 
+    bool loadFEN(std::string FEN);
+
     void computeMove(const Move & m);
     void unComputeMove(const Move & m);
 
