@@ -77,7 +77,7 @@ bool Board::loadFEN(std::string fenNotation){
     }
     std::cout<<"Passed table check"<<std::endl;
 
-    if (colorInfo != "W" and colorInfo != "B"){
+    if (colorInfo != "w" and colorInfo != "b"){
         return false;
     }
     std::cout<<"Passed color"<<std::endl;
@@ -127,7 +127,7 @@ bool Board::loadFEN(std::string fenNotation){
         }
         posY = posY+1;
     }
-    turn = colorInfo[0];
+    turn = std::toupper(colorInfo[0]);
     std::vector<int> newFlag= {-1, -1, -1, -1, -1};
     for (int i = 0; i<rockInfo.length(); i++){
         if (rockInfo[i] == 'Q'){
@@ -149,7 +149,8 @@ bool Board::loadFEN(std::string fenNotation){
     flags = boardFlags(newFlag[0], newFlag[1], newFlag[2], newFlag[3], newFlag[4]);
     return true;
 }
-Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1){
+
+Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSinceLastEvent(0){
 
     //Pawn creation
     for (int i = 0; i<8; i++){
@@ -235,14 +236,26 @@ void Board::computeMove(const Move & m){
         turn = 'B';
         break;
     case 'B':
+        nbMove += 1;
         turn = 'W';
         break;
+    }
+    nbMoveSinceLastEvent += 1;
+    if (m.getEventMove()){
+        nbMoveSinceLastEvent = 0;
     }
 }
 
 void Board::unComputeMove(const Move & m){
-    Move reversedMove(m.getNewPieces(),m.getOldPieces(),m.getNewFlags(),m.getOldFlags(), "");
+    Move reversedMove(m.getNewPieces(),m.getOldPieces(),m.getNewFlags(),m.getOldFlags(), "", false, 0);
     this->computeMove(reversedMove);
+    nbMove = nbMove - 1;
+    if (m.getEventMove()){
+        nbMoveSinceLastEvent = m.getOldNbMoveSinceLastEvent();
+    }
+    else{
+        nbMoveSinceLastEvent = nbMoveSinceLastEvent - 2;
+    }
 }
 
 
@@ -267,7 +280,7 @@ bool Board::kingIsPending(){
 bool Board::isLegal(const Move & m){
     this->computeMove(m);
     bool res = !(this->kingIsPending());
-    this->unComputeMove(m);
+    this->unComputeMove(m); 
     return res;
 }
 
@@ -336,14 +349,19 @@ Move Board::constructMove(Piece movingPiece, deplacement depl) const{
     
     std::list<Piece> oldPieces({movingPiece});
     std::list<Piece> newPieces({movingPiece.deplacePiece(depl)});
+    bool eventMove = false;
 
     boardFlags newFlags = this->constructFlags(movingPiece, depl);
 
     std::string notation=constructNotation(movingPiece, depl);
 
     int destinationIndex = getIndex(depl.getDestinationX(), depl.getDestinationY());
+    if (movingPiece.getKind()=='P'){
+        eventMove = true;
+    }
     if (table[destinationIndex].getColor() != '_'){
         oldPieces.push_front(table[destinationIndex]);
+        eventMove = true;
     }
     if (depl.getTag()==enPassant){
         notation = notation + 'x';
@@ -370,7 +388,7 @@ Move Board::constructMove(Piece movingPiece, deplacement depl) const{
         oldPieces.push_front(table[getIndex(7,7)]);
         newPieces.push_front(Piece(5, 7, 'B', 'R'));
     }
-    return Move(oldPieces, newPieces, flags, newFlags, notation);
+    return Move(oldPieces, newPieces, flags, newFlags, notation, eventMove, nbMoveSinceLastEvent);
 }
 
 std::string Board::getFENNotation() const{

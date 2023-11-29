@@ -19,7 +19,15 @@ std::string Move::getNotation() const{
     return notation;
 }
 
-Move::Move(const Move & _Move): oldPieces(_Move.oldPieces),newPieces(_Move.newPieces), oldFlags(_Move.getOldFlags()), newFlags(_Move.getNewFlags()), notation(_Move.getNotation()){}
+bool Move::getEventMove() const{
+    return eventMove;
+}
+
+ int Move::getOldNbMoveSinceLastEvent() const{
+    return oldNbMoveSinceLastEvent;
+ }
+
+Move::Move(const Move & _Move): oldPieces(_Move.oldPieces),newPieces(_Move.newPieces), oldFlags(_Move.getOldFlags()), newFlags(_Move.getNewFlags()), notation(_Move.getNotation()), eventMove(_Move.getEventMove()){}
 
 bool Move::eatsKing(char color) const{
     bool res(false);

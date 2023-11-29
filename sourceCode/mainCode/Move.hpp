@@ -16,10 +16,12 @@ class Move{
         boardFlags oldFlags;
         boardFlags newFlags;
         std::string notation;
+        bool eventMove;
+        int oldNbMoveSinceLastEvent;
     public:
         //constructeurs & destructeurs
-        Move(): oldPieces({}), newPieces({}), oldFlags(-1, 1, 1, 1, 1), newFlags(-1, 1, 1, 1, 1), notation(""){};
-        Move(std::list<Piece> _oldPieces,std::list<Piece> _newPieces, boardFlags _oldFlags, boardFlags _newFlags, std::string _notation): oldPieces(_oldPieces), newPieces(_newPieces), oldFlags(_oldFlags), newFlags(_newFlags), notation(_notation){};
+        Move(): oldPieces({}), newPieces({}), oldFlags(-1, 1, 1, 1, 1), newFlags(-1, 1, 1, 1, 1), notation(""), eventMove(false), oldNbMoveSinceLastEvent(0){};
+        Move(std::list<Piece> _oldPieces,std::list<Piece> _newPieces, boardFlags _oldFlags, boardFlags _newFlags, std::string _notation, bool _eventMove, int _oldNbMoveSinceLastEvent): oldPieces(_oldPieces), newPieces(_newPieces), oldFlags(_oldFlags), newFlags(_newFlags), notation(_notation), eventMove(_eventMove), oldNbMoveSinceLastEvent(_oldNbMoveSinceLastEvent){};
         Move(const Move & _Move);
         ~Move(){};
 
@@ -29,6 +31,8 @@ class Move{
         boardFlags getOldFlags() const;
         boardFlags getNewFlags() const;
         std::string getNotation() const;
+        bool getEventMove() const;
+        int getOldNbMoveSinceLastEvent() const;
 
         bool eatsKing(char color) const;
 };

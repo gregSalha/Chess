@@ -14,6 +14,8 @@ private:
     std::vector<Piece> table;
     boardFlags flags;
     char turn;
+    int nbMove;
+    int nbMoveSinceLastEvent;
 public:
     //constructeurs et accesseurs
     Board();
@@ -24,6 +26,8 @@ public:
     char getTurn() const{return turn;};
     boardFlags getFlags() const{return flags;};
     Piece operator[](int index) const;
+    int getNbMove() const{return nbMove;};
+    int getNbMoveSinceLastEvent() const{return nbMoveSinceLastEvent;};
 
     bool loadFEN(std::string FEN);
 
