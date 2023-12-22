@@ -27,7 +27,7 @@ bool Move::getEventMove() const{
     return oldNbMoveSinceLastEvent;
  }
 
-Move::Move(const Move & _Move): oldPieces(_Move.oldPieces),newPieces(_Move.newPieces), oldFlags(_Move.getOldFlags()), newFlags(_Move.getNewFlags()), notation(_Move.getNotation()), eventMove(_Move.getEventMove()){}
+Move::Move(const Move & _Move): oldPieces(_Move.oldPieces),newPieces(_Move.newPieces), oldFlags(_Move.getOldFlags()), newFlags(_Move.getNewFlags()), notation(_Move.getNotation()), eventMove(_Move.getEventMove()), oldNbMoveSinceLastEvent(_Move.getOldNbMoveSinceLastEvent()){}
 
 bool Move::eatsKing(char color) const{
     bool res(false);

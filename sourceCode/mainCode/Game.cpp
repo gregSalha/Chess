@@ -55,6 +55,9 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 if (currentPosition.kingIsPending()){
                     result = 'B';
                 }
+                else{
+                    result = 'D';
+                }
                 currentPosition.unComputeMove(passTurn);
                 break;
             }
@@ -69,6 +72,9 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 currentPosition.computeMove(passTurn);
                 if (currentPosition.kingIsPending()){
                     result = 'W';
+                }
+                else{
+                    result = 'D';
                 }
                 currentPosition.unComputeMove(passTurn);
                 break;

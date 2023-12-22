@@ -186,7 +186,7 @@ Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSi
 
 }
 
-Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn), flags(_Board.flags){}
+Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn), flags(_Board.flags), nbMove(_Board.getNbMove()), nbMoveSinceLastEvent(_Board.getNbMoveSinceLastEvent()){}
 
 Board::~Board(){}
 
@@ -250,12 +250,15 @@ void Board::unComputeMove(const Move & m){
     Move reversedMove(m.getNewPieces(),m.getOldPieces(),m.getNewFlags(),m.getOldFlags(), "", false, 0);
     this->computeMove(reversedMove);
     nbMove = nbMove - 1;
+    nbMoveSinceLastEvent = m.getOldNbMoveSinceLastEvent();
+    /*
     if (m.getEventMove()){
         nbMoveSinceLastEvent = m.getOldNbMoveSinceLastEvent();
     }
     else{
         nbMoveSinceLastEvent = nbMoveSinceLastEvent - 2;
     }
+    */
 }
 
 
