@@ -12,6 +12,7 @@ void Game::write(std::string placeToSave){
     flux << "[Round \"1\"]\n";
     flux << "[White \"White AI\"]\n";
     flux << "[Black \"Black AI\"]\n";
+    flux << "[FEN \"" << startingPosition.getFENNotation() << "\"]\n";
     switch(result){
         case 'D':
             flux << "[Result \"1/2-1/2\"]\n\n";
@@ -49,7 +50,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 nextMove = whiteIA.getNextMove(G, currentPosition);
             }
             catch(int errorCode){
-                std::cout<<"Error"<<std::endl;
+                std::cout<<""<<std::endl;
                 Move passTurn;
                 currentPosition.computeMove(passTurn);
                 if (currentPosition.kingIsPending()){
@@ -67,7 +68,6 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
                 nextMove = blackIA.getNextMove(G, currentPosition);
             }
             catch(int errorCode){
-                std::cout<<"Error"<<std::endl;
                 Move passTurn;
                 currentPosition.computeMove(passTurn);
                 if (currentPosition.kingIsPending()){

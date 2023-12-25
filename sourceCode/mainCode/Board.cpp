@@ -5,35 +5,37 @@
 
 bool Board::loadFEN(std::string fenNotation){
 
-    if (fenNotation.find(" ") ==std::string::npos){
+    if (fenNotation.find(" ")==std::string::npos){
         return false;
     };
     std::string tableInfo = fenNotation.substr(0, fenNotation.find(" "));
-    std::cout<<tableInfo<<std::endl;
     fenNotation.erase(0, fenNotation.find(" ")+1);
 
     if (fenNotation.find(" ") ==std::string::npos){
         return false;
     };
     std::string colorInfo = fenNotation.substr(0, fenNotation.find(" "));
-    std::cout<<colorInfo<<std::endl;
     fenNotation.erase(0, fenNotation.find(" ")+1);
 
     if (fenNotation.find(" ") ==std::string::npos){
         return false;
     };
     std::string rockInfo = fenNotation.substr(0, fenNotation.find(" "));
-    std::cout<<rockInfo<<std::endl;
     fenNotation.erase(0, fenNotation.find(" ")+1);
 
     if (fenNotation.find(" ") ==std::string::npos){
         return false;
     };
     std::string enPassantInfo = fenNotation.substr(0, fenNotation.find(" "));
-    std::cout<<enPassantInfo<<std::endl;
     fenNotation.erase(0, fenNotation.find(" ")+1);
 
+    if (fenNotation.find(" ") ==std::string::npos){
+        return false;
+    };
+    std::string lastEventInfo = fenNotation.substr(0, fenNotation.find(" "));
+    fenNotation.erase(0, fenNotation.find(" ")+1);
 
+    std::string nbMoveInfo = fenNotation;
 
     std::list<std::string> linePosList={};
     for (int i = 0; i<7; i++){
@@ -48,10 +50,10 @@ bool Board::loadFEN(std::string fenNotation){
     std::list<char> acceptableChar = {'p', 'r', 'q', 'k', 'n', 'b','P', 'R', 'Q', 'K', 'N', 'B'};
     for (auto s = linePosList.begin(); s!=linePosList.end(); s++){
         std::string currentLine = *s;
-        std::cout<<"Considering line " << currentLine << std::endl;
+        //std::cout<<"Considering line " << currentLine << std::endl;
         int counter=0;
         for (int j = 0; j<currentLine.length(); j++){
-            std::cout<<"Doing char " << j << " counter at " << counter << std::endl;
+            //std::cout<<"Doing char " << j << " counter at " << counter << std::endl;
             if(std::isdigit(currentLine[j])){
                 counter = counter + int(currentLine[j]) - 48;
             }
@@ -75,22 +77,47 @@ bool Board::loadFEN(std::string fenNotation){
             return false;
         }
     }
-    std::cout<<"Passed table check"<<std::endl;
+    //std::cout<<"Passed table check"<<std::endl;
 
     if (colorInfo != "w" and colorInfo != "b"){
         return false;
     }
-    std::cout<<"Passed color"<<std::endl;
+    //std::cout<<"Passed color"<<std::endl;
 
     if (rockInfo.length() > 4){
         return false;
     }
-    for (int i = 0; i< rockInfo.length(); i++){
-        if (rockInfo[i] != 'K' and rockInfo[i] != 'Q' and rockInfo[i] != 'k' and rockInfo[i] != 'q'){
+    if (rockInfo != "-"){
+        for (int i = 0; i< rockInfo.length(); i++){
+            if (rockInfo[i] != 'K' and rockInfo[i] != 'Q' and rockInfo[i] != 'k' and rockInfo[i] != 'q'){
+                return false;
+            }
+        }
+    }
+
+    try{
+        int potentialNbOfMove = std::stoi(nbMoveInfo);
+        if (potentialNbOfMove<0){
             return false;
         }
     }
-    std::cout<<"Passed rock info"<<std::endl;
+    catch(std::exception &err)
+    {
+        return false;
+    }
+
+    try{
+        int potentialLastEventInfo = std::stoi(lastEventInfo);
+        if (potentialLastEventInfo<0){
+            return false;
+        }
+    }
+    catch(std::exception &err)
+    {
+        return false;
+    }
+    
+    //std::cout<<"Passed rock info"<<std::endl;
 
     acceptableChar = {'-','1', '2', '3', '4', '5', '6', '7', '8'};
     bool acceptable = false;
@@ -106,7 +133,7 @@ bool Board::loadFEN(std::string fenNotation){
     if (!acceptable){
         return false;
     }
-    std::cout<<"Passed en passant"<<std::endl;
+    //std::cout<<"Passed en passant"<<std::endl;
 
     int posY = 0;
     for (auto line = linePosList.begin(); line != linePosList.end(); line++){
@@ -121,7 +148,26 @@ bool Board::loadFEN(std::string fenNotation){
                 if (!std::isupper(currentLine[i])){
                     Color = 'B';
                 }
-                table[getIndex(posX, posY)] = Piece(posX, posY, Color, std::toupper(currentLine[i]));
+                char pieceType = currentLine[i];
+                if (pieceType=='p'){
+                    pieceType = 'P';
+                }
+                else if (pieceType=='r'){
+                    pieceType = 'R';
+                }
+                else if (pieceType=='q'){
+                    pieceType = 'Q';
+                }
+                else if (pieceType=='b'){
+                    pieceType = 'B';
+                }
+                else if (pieceType=='n'){
+                    pieceType = 'N';
+                }
+                else if (pieceType=='k'){
+                    pieceType = 'K';
+                }
+                table[getIndex(posX, posY)] = Piece(posX, posY, Color, pieceType);
                 posX = posX+1;
             }
         }
@@ -147,11 +193,13 @@ bool Board::loadFEN(std::string fenNotation){
         newFlag[0] = std::stoi(enPassantInfo);
     }
     flags = boardFlags(newFlag[0], newFlag[1], newFlag[2], newFlag[3], newFlag[4]);
+    nbMove = std::stoi(nbMoveInfo);
+    nbMoveSinceLastEvent = std::stoi(lastEventInfo);
     return true;
 }
 
 Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSinceLastEvent(0){
-
+    /*
     //Pawn creation
     for (int i = 0; i<8; i++){
         table[getIndex(i, 1)] = Piece(i, 1, 'W', 'P');
@@ -183,7 +231,7 @@ Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSi
     table[getIndex(6, 0)] = Piece(6, 0, 'W', 'N');
     table[getIndex(1, 7)] = Piece(1, 7, 'B', 'N');
     table[getIndex(6, 7)] = Piece(6, 7, 'B', 'N');
-
+    */
 }
 
 Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn), flags(_Board.flags), nbMove(_Board.getNbMove()), nbMoveSinceLastEvent(_Board.getNbMoveSinceLastEvent()){}
@@ -421,7 +469,12 @@ std::string Board::getFENNotation() const{
         res.push_back('/');
     }
     res.pop_back();
-    res = res + " " + turn + " ";
+    if (turn == 'W'){
+        res = res + " w ";
+    }
+    else{
+        res = res + " b ";
+    }
     if (flags.getSmallRockWhite()==1){
         res.push_back('K');
     }
@@ -434,6 +487,8 @@ std::string Board::getFENNotation() const{
     if (flags.getBigRockBlack()==1){
         res.push_back('q');
     }
+
+    res = res + " " + std::to_string(nbMoveSinceLastEvent) + " " +  std::to_string(nbMove);
 
     return res;
 }
