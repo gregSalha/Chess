@@ -1,2 +1,4 @@
 This a chess engine project by Grégoire Salha.
-Execute "sh build.sh" will create a chessApp folder in the containing folder with the executable
+Run "cmake -S sourceCode -B <your-build-location>"
+The executable is chessApp.exe
+Needs a config file to run -> you can use config1.txt
