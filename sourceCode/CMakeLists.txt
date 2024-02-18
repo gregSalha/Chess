@@ -1,7 +1,9 @@
 add_executable(gsChessApp main.cpp Board.cpp boardFlags.cpp deplacement.cpp Game.cpp IA.cpp indexHandler.cpp match.cpp Move.cpp Pieces.cpp)
+configure_file("config1.txt" "${CMAKE_CURRENT_BINARY_DIR}/" COPYONLY)
 
 if (BUILD_TESTING)
 	add_executable(unitTests unitTests.cpp Board.cpp boardFlags.cpp deplacement.cpp Game.cpp IA.cpp indexHandler.cpp match.cpp Move.cpp Pieces.cpp)
+	configure_file("testFile.txt" "${CMAKE_CURRENT_BINARY_DIR}/" COPYONLY)
 	target_link_libraries(unitTests PRIVATE GTest::gtest_main)
 	include(GoogleTest)
 	gtest_discover_tests(unitTests)
