@@ -79,7 +79,7 @@ bool Board::loadFEN(std::string fenNotation){
     }
     //std::cout<<"Passed table check"<<std::endl;
 
-    if (colorInfo != "w" and colorInfo != "b"){
+    if ((colorInfo != "w") && (colorInfo != "b")){
         return false;
     }
     //std::cout<<"Passed color"<<std::endl;
@@ -89,7 +89,7 @@ bool Board::loadFEN(std::string fenNotation){
     }
     if (rockInfo != "-"){
         for (int i = 0; i< rockInfo.length(); i++){
-            if (rockInfo[i] != 'K' and rockInfo[i] != 'Q' and rockInfo[i] != 'k' and rockInfo[i] != 'q'){
+            if ((rockInfo[i] != 'K') && (rockInfo[i] != 'Q') && (rockInfo[i] != 'k') && (rockInfo[i] != 'q')){
                 return false;
             }
         }
@@ -199,39 +199,6 @@ bool Board::loadFEN(std::string fenNotation){
 }
 
 Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSinceLastEvent(0){
-    /*
-    //Pawn creation
-    for (int i = 0; i<8; i++){
-        table[getIndex(i, 1)] = Piece(i, 1, 'W', 'P');
-        table[getIndex(i, 6)] = Piece(i, 6, 'B', 'P');
-    }
-
-    //King creation
-    table[getIndex(4, 0)] = Piece(4, 0, 'W', 'K');
-    table[getIndex(4, 7)] = Piece(4, 7, 'B', 'K');
-
-    //Rook Creation
-    table[getIndex(0, 0)] = Piece(0, 0, 'W', 'R');
-    table[getIndex(7, 0)] = Piece(7, 0, 'W', 'R');
-    table[getIndex(0, 7)] = Piece(0, 7, 'B', 'R');
-    table[getIndex(7, 7)] = Piece(7, 7, 'B', 'R');
-
-    //Bishop Creation
-    table[getIndex(2, 0)] = Piece(2, 0, 'W', 'B');
-    table[getIndex(5, 0)] = Piece(5, 0, 'W', 'B');
-    table[getIndex(2, 7)] = Piece(2, 7, 'B', 'B');
-    table[getIndex(5, 7)] = Piece(5, 7, 'B', 'B');
-
-    //Queen Creation
-    table[getIndex(3, 0)] = Piece(3, 0, 'W', 'Q');
-    table[getIndex(3, 7)] = Piece(3, 7, 'B', 'Q');
-
-    //Knight Creation
-    table[getIndex(1, 0)] = Piece(1, 0, 'W', 'N');
-    table[getIndex(6, 0)] = Piece(6, 0, 'W', 'N');
-    table[getIndex(1, 7)] = Piece(1, 7, 'B', 'N');
-    table[getIndex(6, 7)] = Piece(6, 7, 'B', 'N');
-    */
 }
 
 Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn), flags(_Board.flags), nbMove(_Board.getNbMove()), nbMoveSinceLastEvent(_Board.getNbMoveSinceLastEvent()){}
@@ -336,10 +303,10 @@ bool Board::isLegal(const Move & m){
 }
 
 std::string Board::constructNotation(Piece movingPiece, deplacement depl) const{
-    if (depl.getTag() == bigRockWhite || depl.getTag() == bigRockBlack){
+    if ((depl.getTag() == bigRockWhite) || (depl.getTag() == bigRockBlack)){
         return "O-O-O";
     }
-    else if (depl.getTag() == smallRockWhite || depl.getTag() == smallRockBlack){
+    else if ((depl.getTag() == smallRockWhite) || (depl.getTag() == smallRockBlack)){
         return "O-O";
     }
     else{
