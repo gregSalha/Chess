@@ -8,27 +8,59 @@ Created on Mon Feb 19 22:42:11 2024
 import chess
 import numpy as np
 
-Nparties = 100
-NMovePerPartie = 10
-fileToSave = "testFile.txt"
+def generateListOfFenPositions(Nparties, NMovePerPartie):
+    res = []
+    for i in range(Nparties):
+        board = chess.Board()
+        gameMove = []
+        for j in range(50):
+            allMoves = [m for m in board.legal_moves]
+            if len(allMoves)>0:
+                chosenMove = np.random.choice(allMoves)
+                gameMove.append(board.fen(en_passant="fen"))
+                board.push(chosenMove)
+            else:
+                break
+        exampleMoves = list(np.random.choice(gameMove, size=NMovePerPartie, replace=False))
+        res = res + exampleMoves
+    return res
 
-res = ""
-
-for i in range(Nparties):
-    game = []
-    board = chess.Board()
-    for j in range(50):
+def saveFENPositionList(file, Nparties, NmovePerPartie):
+    res=""
+    listFen = generateListOfFenPositions(Nparties, NmovePerPartie)
+    for m in listFen:
+        res = res + m + "\n"
+    f = open(file, 'w', newline='')
+    f.write(res)
+    f.close()
+    
+def saveMoveCountFromFenList(file, Nparties, NmovePerPartie):
+    res=""
+    listFen = generateListOfFenPositions(Nparties, NmovePerPartie)
+    for m in listFen:
+        board = chess.Board(m)
         allMoves = [m for m in board.legal_moves]
-        game.append(board.fen() + "\n" + str(len(allMoves)) + "\n")
-        if len(allMoves)>0:
-            chosenMove = np.random.choice(allMoves)
-            board.push(chosenMove)
-        else:
-            break
-    exampleMoves = np.random.choice(game, size=NMovePerPartie, replace=False)
-    for k in exampleMoves:
-        res = res + k
-
-f = open(fileToSave, mode = 'w')
-f.write(res)
-f.close()
+        res = res + m + "\n" + str(len(allMoves)) + "\n"
+    f = open(file, 'w', newline='')
+    f.write(res)
+    f.close()
+    
+def savePostionsAvaibleFromFen(file, Nparties, NmovePerPartie):
+    res=""
+    listFen = generateListOfFenPositions(Nparties, NmovePerPartie)
+    for m in listFen:
+        res = res + m + "\n"
+        board = chess.Board(m)
+        allMoves = [m for m in board.legal_moves]
+        for possibleMove in allMoves:
+            newBoard = chess.Board(m)
+            newBoard.push(possibleMove)
+            res = res + newBoard.fen(en_passant="fen") + "\n"
+        res = res + "-#-\n"
+    f = open(file, 'w', newline='')
+    f.write(res)
+    f.close()
+    
+saveFENPositionList("testFileFENPositions.txt", 100, 10)
+saveMoveCountFromFenList("testFilePositionCount.txt", 100, 10)
+savePostionsAvaibleFromFen("testFilePositionAvaible.txt", 100, 10)

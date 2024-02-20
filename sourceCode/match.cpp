@@ -33,7 +33,7 @@ void loadTagIntoDict(std::string line, std::map<std::string, std::string> & dict
     if (tagKey[0] != '['){
       return;
     }
-    if (tagValue.substr(tagValue.length()-3,2) != "\"]" or tagValue[0] != '\"'){
+    if ((tagValue.substr(tagValue.length()-3,2) != "\"]") || (tagValue[0] != '\"')){
       return;
     }
     else{

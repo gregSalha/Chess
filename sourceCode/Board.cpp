@@ -95,6 +95,20 @@ bool Board::loadFEN(std::string fenNotation){
         }
     }
 
+    if (enPassantInfo != "-"){
+        if (enPassantInfo.length() != 2){
+            return false;
+        }
+        else{
+            if ((int(enPassantInfo[0]) < 97) || (int(enPassantInfo[0]) > 104)){
+                return false;
+            }
+            if ((int(enPassantInfo[1]) < 49) || (int(enPassantInfo[1]) > 56)){
+                return false;
+            }
+        }
+    }
+
     try{
         int potentialNbOfMove = std::stoi(nbMoveInfo);
         if (potentialNbOfMove<0){
@@ -116,24 +130,6 @@ bool Board::loadFEN(std::string fenNotation){
     {
         return false;
     }
-    
-    //std::cout<<"Passed rock info"<<std::endl;
-
-    acceptableChar = {'-','1', '2', '3', '4', '5', '6', '7', '8'};
-    bool acceptable = false;
-    if (enPassantInfo.length() != 1){
-        return false;
-    }
-    for (auto s = acceptableChar.begin(); s!= acceptableChar.end(); s++){
-        if (enPassantInfo[0] == *s){
-            acceptable = true;
-            break;
-        }
-    }
-    if (!acceptable){
-        return false;
-    }
-    //std::cout<<"Passed en passant"<<std::endl;
 
     int posY = 0;
     for (auto line = linePosList.begin(); line != linePosList.end(); line++){
@@ -190,7 +186,7 @@ bool Board::loadFEN(std::string fenNotation){
         } 
     }
     if (enPassantInfo!="-"){
-        newFlag[0] = std::stoi(enPassantInfo);
+        newFlag[0] = int(enPassantInfo[0])-97;
     }
     flags = boardFlags(newFlag[0], newFlag[1], newFlag[2], newFlag[3], newFlag[4]);
     nbMove = std::stoi(nbMoveInfo);
@@ -442,19 +438,40 @@ std::string Board::getFENNotation() const{
     else{
         res = res + " b ";
     }
+    bool noRockPossible = true;
     if (flags.getSmallRockWhite()==1){
+        noRockPossible = false;
         res.push_back('K');
     }
     if (flags.getBigRockWhite()==1){
+        noRockPossible = false;
         res.push_back('Q');
     }
     if (flags.getSmallRockBlack()==1){
+        noRockPossible = false;
         res.push_back('k');
     }
     if (flags.getBigRockBlack()==1){
+        noRockPossible = false;
         res.push_back('q');
     }
+    if (noRockPossible){
+        res =  res + "-";
+    }
 
+    res = res + " ";
+    if (flags.getEnPassantFlag() != -1){
+        res = res + char(97+flags.getEnPassantFlag());
+        if (turn=='W'){
+            res = res + '6';
+        }
+        else{
+            res = res + '3';
+        }
+    }
+    else{
+        res = res + "-";
+    }
     res = res + " " + std::to_string(nbMoveSinceLastEvent) + " " +  std::to_string(nbMove);
 
     return res;
