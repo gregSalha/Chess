@@ -356,6 +356,18 @@ boardFlags Board::constructFlags(Piece movingPiece, deplacement depl) const{
     if (movingPiece == Piece(7, 7, 'B', 'R')  || movingPiece == Piece(4, 7, 'B', 'K')){
         newSmallRockBlack = -1;
     }
+    if ((movingPiece.getColor()=='B') && (depl.getDestinationX()==0) && (depl.getDestinationY()==0)){
+        newBigRockWhite = -1;
+    }
+    if ((movingPiece.getColor()=='B') && (depl.getDestinationX()==7) && (depl.getDestinationY()==0)){
+        newSmallRockWhite = -1;
+    }
+    if ((movingPiece.getColor()=='W') && (depl.getDestinationX()==0) && (depl.getDestinationY()==7)){
+        newBigRockBlack = -1;
+    }
+    if ((movingPiece.getColor()=='W') && (depl.getDestinationX()==7) && (depl.getDestinationY()==7)){
+        newSmallRockBlack = -1;
+    }
     return boardFlags(newEnPassantMove, newBigRockWhite, newSmallRockWhite, newBigRockBlack, newSmallRockBlack);
 }
 

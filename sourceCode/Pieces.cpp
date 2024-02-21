@@ -126,7 +126,7 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
             }
             else{
                 if (flags.getBigRockBlack()==1){
-                    bool canRock(false);
+                    bool canRock(true);
                     for (int i=0; i<3; i++){
                         if (table[getIndex(3-i, 7)].getKind()!='_'){
                             canRock = false;
