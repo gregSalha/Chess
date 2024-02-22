@@ -204,7 +204,7 @@ Board::~Board(){}
 Piece Board::operator[](int index) const{
     return table[index];
 }
-
+/*
 std::list<Move> Board::getPotentialMove() const{
     std::list<Move> res(0);
     for(int i = 0; i <64; i++){
@@ -224,6 +224,22 @@ std::list<Move> Board::getLegalMove(){
     for (auto i = potentialMove.begin(); i!= potentialMove.end(); i++){
         if (this->isLegal(*i)){
             res.push_front(*i);
+        }
+    }
+    return res;
+}
+*/
+
+std::list<Move> Board::getLegalMove(){
+    std::list<Move> res(0);
+    for(int i = 0; i <64; i++){
+        if (table[i].getColor()==turn){
+            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
+            for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
+                if (this->isLegal(table[i], *depl)){
+                    res.push_back(this->constructMove(table[i], *depl));
+                }
+            }
         }
     }
     return res;
@@ -280,15 +296,17 @@ void operator<<(std::ostream & flux, const Board & B){
 }
 
 bool Board::kingIsPending(){
-    bool res(false);
-    std::list<Move> potentialMove = this->getPotentialMove();
-    for (auto i= potentialMove.begin(); i!=potentialMove.end(); i++){
-        if (i->eatsKing(turn)){
-            res = true;
-            break;
+    for(int i = 0; i <64; i++){
+        if (table[i].getColor()==turn){
+            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
+            for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
+                if ((this->constructMove(table[i], *depl)).eatsKing(turn)){
+                    return true;
+                }   
+            }
         }
     }
-    return res;
+    return false;
 }
 
 bool Board::isLegal(const Move & m){
@@ -296,6 +314,43 @@ bool Board::isLegal(const Move & m){
     bool res = !(this->kingIsPending());
     this->unComputeMove(m); 
     return res;
+}
+
+std::vector<Move> Board::getMovesToCheck(const Piece & movingPiece, const deplacement & d){
+    std::vector<Move> res = {constructMove(movingPiece, d)};
+    if (d.getTag() == bigRockWhite){
+        res.push_back(Move({}, {}, flags, flags, "", false, nbMoveSinceLastEvent));
+        res.push_back(Move({Piece(4, 0, 'W', 'K')}, {Piece(3, 0, 'W', 'K')}, flags, flags, "", false, nbMoveSinceLastEvent));
+        
+    }
+    if (d.getTag() == smallRockWhite){
+        res.push_back(Move({}, {}, flags, flags, "", false, nbMoveSinceLastEvent));
+        res.push_back(Move({Piece(4, 0, 'W', 'K')}, {Piece(5, 0, 'W', 'K')}, flags, flags, "", false, nbMoveSinceLastEvent));
+        
+    }
+    if (d.getTag() == bigRockBlack){
+        res.push_back(Move({}, {}, flags, flags, "", false, nbMoveSinceLastEvent));
+        res.push_back(Move({Piece(4, 7, 'B', 'K')}, {Piece(3, 7, 'B', 'K')}, flags, flags, "", false, nbMoveSinceLastEvent));
+    }
+    if (d.getTag() == smallRockBlack){
+        res.push_back(Move({}, {}, flags, flags, "", false, nbMoveSinceLastEvent));
+        res.push_back(Move({Piece(4, 7, 'B', 'K')}, {Piece(5, 7, 'B', 'K')}, flags, flags, "", false, nbMoveSinceLastEvent));
+        
+    }
+    return res;
+}
+
+bool Board::isLegal(const Piece & movingPiece, const deplacement & d){
+    std::vector<Move> moveToCheck = getMovesToCheck(movingPiece, d);
+    for (auto i = moveToCheck.begin(); i != moveToCheck.end(); i++){
+        this->computeMove(*i);
+        bool res = !(this->kingIsPending());
+        this->unComputeMove(*i);
+        if (!res){
+            return false;
+        }
+    }
+    return true;
 }
 
 std::string Board::constructNotation(Piece movingPiece, deplacement depl) const{
@@ -371,7 +426,7 @@ boardFlags Board::constructFlags(Piece movingPiece, deplacement depl) const{
     return boardFlags(newEnPassantMove, newBigRockWhite, newSmallRockWhite, newBigRockBlack, newSmallRockBlack);
 }
 
-Move Board::constructMove(Piece movingPiece, deplacement depl) const{
+Move Board::constructMove(const Piece & movingPiece, const deplacement & depl) const{
     
     std::list<Piece> oldPieces({movingPiece});
     std::list<Piece> newPieces({movingPiece.deplacePiece(depl)});

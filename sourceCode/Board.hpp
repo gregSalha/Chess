@@ -35,15 +35,17 @@ class Board{
         void unComputeMove(const Move & m);
 
         bool kingIsPending();
+        std::vector<Move> getMovesToCheck(const Piece & movingPiece, const deplacement & d);
+        bool isLegal(const Piece & movingPiece, const deplacement & d);
         bool isLegal(const Move & m);
 
         std::string constructNotation(Piece movingPiece, deplacement depl) const;
         boardFlags constructFlags(Piece movingPiece, deplacement depl) const;
-        Move constructMove(Piece movingPiece, deplacement depl) const;
+        Move constructMove(const Piece & movingPiece, const deplacement & depl) const;
 
         std::string getFENNotation() const;
 
-        std::list<Move> getPotentialMove() const;
+        //std::list<Move> getPotentialMove() const;
         std::list<Move> getLegalMove();
         friend void operator<< (std::ostream & flux, const Board & B);
 };
