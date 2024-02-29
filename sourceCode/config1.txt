@@ -1,4 +1,4 @@
 [maxNumberOfMove "1000"]
 [numberOfRun "100"]
-[fenStartingPos "7k/R7/8/8/1R6/8/8/7K w - - 0 1"]
+[fenStartingPos "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0"]
 [runID "test"]

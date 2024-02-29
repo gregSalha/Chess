@@ -5,6 +5,7 @@
 #include <random>
 #include <ctime>
 #include <utility>
+#include <functional>
 
 class IA{
 protected:
@@ -19,6 +20,16 @@ class randomIA: public IA{
 public:
     randomIA(char _color): IA(_color){};
     Move getNextMove(std::mt19937_64 & G, Board & position) const;
+};
+
+class standardMinMaxIA: public IA{
+protected:
+    int depth;
+    std::function<float(Board & position)> evaluationFunction;
+public:
+    standardMinMaxIA(char _color, int _depth, std::function<float(Board & position)> _evaluationFunction): IA(_color), depth(_depth), evaluationFunction(_evaluationFunction){};
+    Move getNextMove(std::mt19937_64 & G, Board & position) const;
+    float evaluatePosition(Board & position, int searchDepth) const;
 };
 
 /*

@@ -19,7 +19,7 @@ TEST(testMoveGenerator, testPositionCount){
         std::getline(inFile, count);
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
-        std::list<Move> listMove = startingPos.getLegalMove();
+        std::vector<Move> listMove = startingPos.getLegalMove();
         EXPECT_EQ(listMove.size(), std::stoi(count)) << "Failed for FEN postion: " << fen;
     }
     inFile.close();
@@ -82,7 +82,7 @@ TEST(testMoveGenerator, testAvaiblePositions){
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(firstPosition);
         std::string resultFen = startingPos.getFENNotation();
-        std::list<Move> listMove = startingPos.getLegalMove();
+        std::vector<Move> listMove = startingPos.getLegalMove();
         std::set<std::string> allMoveFound = {};
         for (auto move = listMove.begin(); move != listMove.end(); move++){
             startingPos.computeMove(*move);

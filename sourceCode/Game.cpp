@@ -40,6 +40,7 @@ void Game::write(std::string placeToSave){
 
 void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
     while(nMovedPlayed < nCoup){
+        std::cout<<"--Move played" << std::endl;
         Move nextMove;
         if (currentPosition.getNbMoveSinceLastEvent() >= 50){
             result = 'D';

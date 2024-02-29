@@ -230,8 +230,8 @@ std::list<Move> Board::getLegalMove(){
 }
 */
 
-std::list<Move> Board::getLegalMove(){
-    std::list<Move> res(0);
+std::vector<Move> Board::getLegalMove(){
+    std::vector<Move> res(0);
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
             std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
