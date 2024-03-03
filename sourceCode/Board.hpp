@@ -9,6 +9,8 @@
 
 class Move;
 
+typedef enum {undecided, whiteInCheckMate, blackInCheckMate, Pat} boardStatus;
+
 class Board{
     private:
         std::vector<Piece> table;
@@ -16,6 +18,19 @@ class Board{
         char turn;
         int nbMove;
         int nbMoveSinceLastEvent;
+
+        bool positionExplored;
+        std::vector<Move> legalMoves;
+        boardStatus status;
+
+        bool kingIsPending();
+
+        std::string constructNotation(Piece movingPiece, deplacement depl) const;
+        boardFlags constructFlags(Piece movingPiece, deplacement depl) const;
+        Move constructMove(const Piece & movingPiece, const deplacement & depl) const;
+
+        std::vector<Move> getMovesToCheck(const Piece & movingPiece, const deplacement & d);
+
     public:
         //constructeurs et accesseurs
         Board();
@@ -29,24 +44,18 @@ class Board{
         int getNbMove() const{return nbMove;};
         int getNbMoveSinceLastEvent() const{return nbMoveSinceLastEvent;};
 
-        bool loadFEN(std::string FEN);
-
         void computeMove(const Move & m);
         void unComputeMove(const Move & m);
-
-        bool kingIsPending();
-        std::vector<Move> getMovesToCheck(const Piece & movingPiece, const deplacement & d);
+        
         bool isLegal(const Piece & movingPiece, const deplacement & d);
-        bool isLegal(const Move & m);
 
-        std::string constructNotation(Piece movingPiece, deplacement depl) const;
-        boardFlags constructFlags(Piece movingPiece, deplacement depl) const;
-        Move constructMove(const Piece & movingPiece, const deplacement & depl) const;
-
+        bool loadFEN(std::string FEN);
         std::string getFENNotation() const;
 
-        //std::list<Move> getPotentialMove() const;
+        void explorePosition();
+
         std::vector<Move> getLegalMove();
+        boardStatus getStatus();
         friend void operator<< (std::ostream & flux, const Board & B);
 };
 

@@ -1,5 +1,6 @@
 #include "Board.hpp"
 #include "indexHandler.hpp"
+#include "helper.hpp"
 
 #include <algorithm>
 
@@ -50,10 +51,8 @@ bool Board::loadFEN(std::string fenNotation){
     std::list<char> acceptableChar = {'p', 'r', 'q', 'k', 'n', 'b','P', 'R', 'Q', 'K', 'N', 'B'};
     for (auto s = linePosList.begin(); s!=linePosList.end(); s++){
         std::string currentLine = *s;
-        //std::cout<<"Considering line " << currentLine << std::endl;
         int counter=0;
         for (int j = 0; j<currentLine.length(); j++){
-            //std::cout<<"Doing char " << j << " counter at " << counter << std::endl;
             if(std::isdigit(currentLine[j])){
                 counter = counter + int(currentLine[j]) - 48;
             }
@@ -77,12 +76,10 @@ bool Board::loadFEN(std::string fenNotation){
             return false;
         }
     }
-    //std::cout<<"Passed table check"<<std::endl;
 
     if ((colorInfo != "w") && (colorInfo != "b")){
         return false;
     }
-    //std::cout<<"Passed color"<<std::endl;
 
     if (rockInfo.length() > 4){
         return false;
@@ -194,7 +191,7 @@ bool Board::loadFEN(std::string fenNotation){
     return true;
 }
 
-Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSinceLastEvent(0){
+Board::Board(): table(64), turn('W'), flags(-1, 1, 1, 1, 1), nbMove(0), nbMoveSinceLastEvent(0), legalMoves(0), positionExplored(false){
 }
 
 Board::Board(const Board & _Board): table(_Board.table),turn(_Board.turn), flags(_Board.flags), nbMove(_Board.getNbMove()), nbMoveSinceLastEvent(_Board.getNbMoveSinceLastEvent()){}
@@ -204,48 +201,24 @@ Board::~Board(){}
 Piece Board::operator[](int index) const{
     return table[index];
 }
-/*
-std::list<Move> Board::getPotentialMove() const{
-    std::list<Move> res(0);
-    for(int i = 0; i <64; i++){
-        if (table[i].getColor()==turn){
-            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
-            for (auto j = deplacementForThisPiece.begin(); j != deplacementForThisPiece.end(); j++){
-                res.push_front(this->constructMove(table[i], *j));
-            }
-        }
-    }
-    return res;
-}
-
-std::list<Move> Board::getLegalMove(){
-    std::list<Move> res(0);
-    std::list<Move> potentialMove = this->getPotentialMove();
-    for (auto i = potentialMove.begin(); i!= potentialMove.end(); i++){
-        if (this->isLegal(*i)){
-            res.push_front(*i);
-        }
-    }
-    return res;
-}
-*/
 
 std::vector<Move> Board::getLegalMove(){
-    std::vector<Move> res(0);
-    for(int i = 0; i <64; i++){
-        if (table[i].getColor()==turn){
-            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
-            for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
-                if (this->isLegal(table[i], *depl)){
-                    res.push_back(this->constructMove(table[i], *depl));
-                }
-            }
-        }
+    if (!positionExplored){
+        explorePosition();
     }
-    return res;
+    return legalMoves;
+}
+boardStatus Board::getStatus(){
+    if (!positionExplored){
+        explorePosition();
+    }
+    return status;
 }
 
 void Board::computeMove(const Move & m){
+    positionExplored = false;
+    legalMoves = {};
+    status = undecided;
     std::list<Piece> oldPieces = m.getOldPieces();
     std::list<Piece> newPieces = m.getNewPieces();
     for (auto i = oldPieces.begin(); i!=oldPieces.end(); i++){
@@ -278,14 +251,6 @@ void Board::unComputeMove(const Move & m){
     this->computeMove(reversedMove);
     nbMove = nbMove - 1;
     nbMoveSinceLastEvent = m.getOldNbMoveSinceLastEvent();
-    /*
-    if (m.getEventMove()){
-        nbMoveSinceLastEvent = m.getOldNbMoveSinceLastEvent();
-    }
-    else{
-        nbMoveSinceLastEvent = nbMoveSinceLastEvent - 2;
-    }
-    */
 }
 
 
@@ -307,13 +272,6 @@ bool Board::kingIsPending(){
         }
     }
     return false;
-}
-
-bool Board::isLegal(const Move & m){
-    this->computeMove(m);
-    bool res = !(this->kingIsPending());
-    this->unComputeMove(m); 
-    return res;
 }
 
 std::vector<Move> Board::getMovesToCheck(const Piece & movingPiece, const deplacement & d){
@@ -542,4 +500,41 @@ std::string Board::getFENNotation() const{
     res = res + " " + std::to_string(nbMoveSinceLastEvent) + " " +  std::to_string(nbMove);
 
     return res;
+}
+
+void Board::explorePosition(){
+    std::vector<Move> allLegalMoves = {};
+    for(int i = 0; i <64; i++){
+        if (table[i].getColor()==turn){
+            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
+            for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
+                if (this->isLegal(table[i], *depl)){
+                    allLegalMoves.push_back(this->constructMove(table[i], *depl));
+                }
+            }
+        }
+    }
+    if (allLegalMoves.size()==0){
+        bool isInCheck = false;
+        Move passTurn;
+        this->computeMove(passTurn);
+        isInCheck = this->kingIsPending();
+        this->unComputeMove(passTurn);
+        if (isInCheck){
+            if (turn=='W'){
+                status = whiteInCheckMate;
+            }
+            else{
+                status = blackInCheckMate;
+            }
+        }
+        else{
+            status = Pat;
+        } 
+    }
+    if (nbMoveSinceLastEvent>50){
+        status = Pat;
+    }
+    legalMoves = allLegalMoves;
+    positionExplored = true;
 }

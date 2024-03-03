@@ -42,51 +42,30 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
     while(nMovedPlayed < nCoup){
         std::cout<<"--Move played" << std::endl;
         Move nextMove;
-        if (currentPosition.getNbMoveSinceLastEvent() >= 50){
-            result = 'D';
-            break;
-        }
-        if (currentPosition.getTurn()=='W'){
-            try{
-                nextMove = whiteIA.getNextMove(G, currentPosition);
-            }
-            catch(int errorCode){
-                std::cout<<""<<std::endl;
-                Move passTurn;
-                currentPosition.computeMove(passTurn);
-                if (currentPosition.kingIsPending()){
-                    result = 'B';
+        currentPosition.explorePosition();
+        switch (currentPosition.getStatus()){
+            case whiteInCheckMate:
+                result = 'B';
+                break;
+            case blackInCheckMate:
+                result = 'W';
+                break;
+            case Pat:
+                result='D';
+                break;
+            case undecided:{
+                if (currentPosition.getTurn()=='W'){
+                    nextMove = whiteIA.getNextMove(G, currentPosition);
                 }
                 else{
-                    result = 'D';
+                    nextMove = blackIA.getNextMove(G, currentPosition);
                 }
-                currentPosition.unComputeMove(passTurn);
+                moveRecord.push_back(nextMove);
+                currentPosition.computeMove(nextMove);
+                nMovedPlayed ++;
                 break;
             }
         }
-        if (currentPosition.getTurn()=='B'){
-            try{
-                nextMove = blackIA.getNextMove(G, currentPosition);
-            }
-            catch(int errorCode){
-                Move passTurn;
-                currentPosition.computeMove(passTurn);
-                if (currentPosition.kingIsPending()){
-                    result = 'W';
-                }
-                else{
-                    result = 'D';
-                }
-                currentPosition.unComputeMove(passTurn);
-                break;
-            }
-        }
-        if (nextMove.getNotation()[0]=='O'){
-            std::cout<<"Rocked here"<<std::endl;
-        }
-        moveRecord.push_back(nextMove);
-        currentPosition.computeMove(nextMove);
-        nMovedPlayed ++;
     }
 }
 

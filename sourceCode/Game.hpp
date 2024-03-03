@@ -6,6 +6,7 @@
 #include <string>
 #include <chrono>
 #include <iomanip>
+#include <map>
 
 #include "IA.hpp"
 
@@ -21,7 +22,6 @@ public:
     Game(const Board& startPos): startingPosition(startPos), currentPosition(startPos), result('U'), nMovedPlayed(0), moveRecord(0){}; 
     char getResult() const;
     int getNMovedPlayed() const;
-    void save() const;
     void play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA);
 
     //void write(std::ostream & flux);

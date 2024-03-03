@@ -1,9 +1,15 @@
 #include "Board.hpp"
 
-float materialCounting(const Board & position);
+float materialCounting(Board & position);
 
-float materialCounting(const Board & position){
+float materialCounting(Board & position){
     float res = 0.0;
+    if (position.getStatus()==whiteInCheckMate){
+        return -1000.0;
+    }
+    else if (position.getStatus()==blackInCheckMate){
+        return 1000.0;
+    }
     for (int i = 0; i<64; i++){
         if (position[i].getColor()=='W'){
             if (position[i].getKind() == 'Q'){

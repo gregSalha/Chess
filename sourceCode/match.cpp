@@ -8,7 +8,7 @@ void Match::run(){
     for (int i = 0; i<numberOfRun; i++){
       //randomIA whiteIA('W');
       //randomIA blackIA('B');
-      standardMinMaxIA whiteIA('W', 3, materialCounting);
+      standardMinMaxIA whiteIA('W', 2, materialCounting);
       standardMinMaxIA blackIA('B', 3, materialCounting);
       Board startingPos; 
       bool fenSuccessfullyLoaded = startingPos.loadFEN(fenStartingPosition);
