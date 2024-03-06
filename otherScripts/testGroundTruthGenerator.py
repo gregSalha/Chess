@@ -61,6 +61,7 @@ def savePostionsAvaibleFromFen(file, Nparties, NmovePerPartie):
     f.write(res)
     f.close()
     
-saveFENPositionList("testFileFENPositions.txt", 100, 10)
-saveMoveCountFromFenList("testFilePositionCount.txt", 100, 10)
-savePostionsAvaibleFromFen("testFilePositionAvaible.txt", 100, 10)
+if __name__=="__main__":
+    saveFENPositionList("testFileFENPositions.txt", 100, 10)
+    saveMoveCountFromFenList("testFilePositionCount.txt", 100, 10)
+    savePostionsAvaibleFromFen("testFilePositionAvaible.txt", 100, 10)
