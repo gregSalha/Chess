@@ -35,6 +35,9 @@ TEST(stringFormating, fenNotation){
         if (!std::getline(inFile, fen)){
             break;
         }
+        if (fen.back() == '\r'){
+            fen.pop_back();
+        }
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
         std::string resultFen = startingPos.getFENNotation();
@@ -59,9 +62,9 @@ TEST(testMoveGenerator, testAvaiblePositions){
         int counter = 0;
         while(std::getline(inFile, nextLine)){
             continueTest = true;
-            //if (nextLine.back() == 'r'){
-            //    nextLine.pop_back();
-            //}
+            if (nextLine.back() == '\r'){
+                nextLine.pop_back();
+            }
             outputMessage = "Entered";
             counter += 1;
             if (nextLine.substr(0,3) == "-#-"){
