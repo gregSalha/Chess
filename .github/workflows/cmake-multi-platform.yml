@@ -63,8 +63,8 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
-    - name: install pychess
-      run: pip install chess
+    - name: configure python
+      run: pip install numpy && pip install chess
     
     - name: run python script
       run: cd otherScripts && python3 -m testGroundTruthGenerator
