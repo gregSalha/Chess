@@ -69,6 +69,9 @@ jobs:
     - name: run python script
       run: cd otherScripts && python3 -m testGroundTruthGenerator
 
+    - name: copy test files to source code
+      run: cp testFileFENPositions.txt ../sourceCode/ && cp testFilePositionCount.txt ../sourceCode/ && cp testFilePositionAvaible.txt ../sourceCode/
+
     - name: echo dir
       run: ls
 
