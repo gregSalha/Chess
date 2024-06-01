@@ -21,7 +21,7 @@ def generateListOfFenPositions(Nparties, NMovePerPartie):
                 board.push(chosenMove)
             else:
                 break
-        exampleMoves = list(np.random.choice(gameMove, size=NMovePerPartie, replace=False))
+        exampleMoves = list(np.random.choice(gameMove, size=min(NMovePerPartie, len(gameMove)),, replace=False))
         res = res + exampleMoves
     return res
 
