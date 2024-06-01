@@ -60,17 +60,8 @@ jobs:
     - name: run python script
       run: cd otherScripts && python3 -m testGroundTruthGenerator
 
-    - name: echo dir
-      run: ls
-
     - name: copy test files to source code
-      run: cp testFileFENPositions.txt ../sourceCode/ && cp testFilePositionCount.txt ../sourceCode/ && cp testFilePositionAvaible.txt ../sourceCode/
-
-    - name: zov
-      run: cd ..
-
-    - name: info
-      run: ls otherScripts
+      run: cp otherScripts/testFileFENPositions.txt ../sourceCode/ && cp otherScripts/testFilePositionCount.txt ../sourceCode/ && cp otherScripts/testFilePositionAvaible.txt ../sourceCode/
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
