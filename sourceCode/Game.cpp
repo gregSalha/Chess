@@ -38,7 +38,7 @@ void Game::write(std::string placeToSave){
     }
 }
 
-void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
+void Game::play(std::mt19937_64 & G, int nCoup, std::shared_ptr<IA> whiteIA, std::shared_ptr<IA> blackIA){
     while(nMovedPlayed < nCoup){
         std::cout<<"--Move played" << std::endl;
         Move nextMove;
@@ -48,7 +48,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
         }
         if (currentPosition.getTurn()=='W'){
             try{
-                nextMove = whiteIA.getNextMove(G, currentPosition);
+                nextMove = whiteIA->getNextMove(G, currentPosition);
             }
             catch(int errorCode){
                 std::cout<<""<<std::endl;
@@ -66,7 +66,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, IA& whiteIA, IA& blackIA){
         }
         if (currentPosition.getTurn()=='B'){
             try{
-                nextMove = blackIA.getNextMove(G, currentPosition);
+                nextMove = blackIA->getNextMove(G, currentPosition);
             }
             catch(int errorCode){
                 Move passTurn;

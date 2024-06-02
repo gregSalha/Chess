@@ -1,9 +1,11 @@
 #include "match.hpp"
+#include "evaluationFunctions.hpp"
 
 #include <ctime>
 #include <fstream>
 #include <chrono>
 #include <iomanip>
+#include <memory>
 
 int main(int argc, char** argv)
 {   
@@ -11,7 +13,9 @@ int main(int argc, char** argv)
     std::cout<<"Invalid argument"<<std::endl;
   }
   else{
-    Match matchToPlay(0, 0, "6k1/p1p2pp1/1q1p3p/1P3P2/1P6/2n1Q3/PB4PP/4R1K1 w - - 48 1", "testFenFailed");
+    std::shared_ptr<standardMinMaxIA> whiteIA = std::make_shared<standardMinMaxIA>('w', 3, materialCounting);
+    std::shared_ptr<standardMinMaxIA> blackIA = std::make_shared<standardMinMaxIA>('b', 3, materialCounting);
+    Match matchToPlay(0, 0, "6k1/p1p2pp1/1q1p3p/1P3P2/1P6/2n1Q3/PB4PP/4R1K1 w - - 48 1", "testFenFailed", whiteIA, blackIA);
     std::string configFile = argv[1];
     bool matchLoaded = matchToPlay.loadFromConfig("./" + configFile);
     if (!matchLoaded){

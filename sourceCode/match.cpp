@@ -6,10 +6,6 @@ void Match::run(){
     std::system(("mkdir -p ./games/" + runID).c_str());
     std::mt19937_64 G(std::time(NULL));
     for (int i = 0; i<numberOfRun; i++){
-      //randomIA whiteIA('W');
-      //randomIA blackIA('B');
-      standardMinMaxIA whiteIA('W', 3, materialCounting);
-      standardMinMaxIA blackIA('B', 3, materialCounting);
       Board startingPos; 
       bool fenSuccessfullyLoaded = startingPos.loadFEN(fenStartingPosition);
       if (!fenSuccessfullyLoaded){

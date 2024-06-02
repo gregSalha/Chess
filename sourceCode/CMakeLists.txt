@@ -1,4 +1,4 @@
-add_executable(gsChessApp main.cpp Board.cpp boardFlags.cpp deplacement.cpp Game.cpp IA.cpp indexHandler.cpp match.cpp Move.cpp Pieces.cpp)
+add_executable(gsChessApp main.cpp Board.cpp boardFlags.cpp deplacement.cpp Game.cpp IA.cpp indexHandler.cpp match.cpp Move.cpp Pieces.cpp evaluationFunctions.cpp)
 
 if (BUILD_TESTING)
 	add_executable(unitTests unitTests.cpp Board.cpp boardFlags.cpp deplacement.cpp Game.cpp IA.cpp indexHandler.cpp match.cpp Move.cpp Pieces.cpp evaluationFunctions.cpp)

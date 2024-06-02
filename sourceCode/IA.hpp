@@ -1,5 +1,5 @@
-//#ifndef IA_HPP_INCLUDED
-//#define IA_HPP_INCLUDED
+#ifndef IA_HPP_INCLUDED
+#define IA_HPP_INCLUDED
 
 #include "Board.hpp"
 #include <random>
@@ -73,4 +73,4 @@ public:
 };
 */
 
-//#endif // IA_HPP_INCLUDED
+#endif // IA_HPP_INCLUDED
