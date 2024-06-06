@@ -13,7 +13,7 @@ class Board{
     private:
         std::vector<Piece> table;
         boardFlags flags;
-        char turn;
+        color_t turn;
         int nbMove;
         int nbMoveSinceLastEvent;
     public:

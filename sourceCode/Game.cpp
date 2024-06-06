@@ -46,7 +46,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, std::shared_ptr<IA> whiteIA, std
             result = 'D';
             break;
         }
-        if (currentPosition.getTurn()=='W'){
+        if (currentPosition.getTurn()==White){
             try{
                 nextMove = whiteIA->getNextMove(G, currentPosition);
             }
@@ -64,7 +64,7 @@ void Game::play(std::mt19937_64 & G, int nCoup, std::shared_ptr<IA> whiteIA, std
                 break;
             }
         }
-        if (currentPosition.getTurn()=='B'){
+        if (currentPosition.getTurn()==Black){
             try{
                 nextMove = blackIA->getNextMove(G, currentPosition);
             }

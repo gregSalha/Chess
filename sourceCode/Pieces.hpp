@@ -16,21 +16,22 @@ class Piece{
 protected:
     int posX;
     int posY;
-    char color;
-    char kind;
+    color_t color;
+    piece_t kind;
 
 public:
     //Constructeurs, destructeurs
-    Piece():posX(-1), posY(-1), color('_'), kind('_'){};
-    Piece(int _posX, int _posY, char _color, char _kind):posX(_posX), posY(_posY), color(_color), kind(_kind){};
+    Piece():posX(-1), posY(-1), color(White), kind(Empty){};
+    Piece(int _posX, int _posY, color_t _color, piece_t _kind):posX(_posX), posY(_posY), color(_color), kind(_kind){};
     Piece(const Piece & _Piece): posX(_Piece.getPosX()),posY(_Piece.getPosY()),color(_Piece.getColor()),kind(_Piece.getKind()){};
     ~Piece(){};
 
     //accesseurs
     int getPosX() const{return(posX);};
     int getPosY() const{return(posY);};
-    char getColor() const{return(color);};
-    char getKind() const{return(kind);};
+    color_t getColor() const{return(color);};
+    piece_t getKind() const{return(kind);};
+    char getNotation(bool inUpperCase) const;
 
     //generic explorers
     void exploreCardinalDirections(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;

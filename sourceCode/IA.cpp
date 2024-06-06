@@ -22,9 +22,9 @@ Move randomIA::getNextMove(std::mt19937_64 & G, Board & position) const{
 Move standardMinMaxIA::getNextMove(std::mt19937_64 & G, Board & position) const{
     Move res;
     std::vector<Move> mvt = position.getLegalMove();
-    int isWhite = 1;
-    if (color=='B'){
-        isWhite = -1;
+    bool isWhite = true;
+    if (color==Black){
+        isWhite = false;
     }
     int nMove = mvt.size();
     if (nMove==0){
@@ -38,15 +38,15 @@ Move standardMinMaxIA::getNextMove(std::mt19937_64 & G, Board & position) const{
         position.unComputeMove(mvt[i]);
         if (i==0){
             bestMove = {mvt[0]};
-            bestScore = isWhite*scoreForThisMove;
+            bestScore = scoreForThisMove;
         }
         else{
-            if (isWhite*scoreForThisMove == bestScore){
+            if (scoreForThisMove == bestScore){
                 bestMove.push_back(mvt[i]);
             }
-            if(isWhite*scoreForThisMove > bestScore){
+            if(scoreForThisMove > bestScore){
                 bestMove = {mvt[i]};
-                bestScore = isWhite*scoreForThisMove;
+                bestScore = scoreForThisMove;
             }
         }
     }
@@ -69,23 +69,26 @@ float standardMinMaxIA::evaluatePosition(Board & position, int searchDepth) cons
         std::vector<Move> mvt = position.getLegalMove();
         int nMove = mvt.size();
         if (nMove == 0){
+            if (color==Black){
+                return -evaluationFunction(position);    
+            }
             return evaluationFunction(position);
         }
-        float bestWhiteScore;
+        float predictedNextScore;
         for (int i = 0; i<nMove; i++){
             position.computeMove(mvt[i]);
             float scoreForThisMove = evaluatePosition(position, searchDepth-1);
-            if (i==0){
-                bestWhiteScore = scoreForThisMove;
-            }
             position.unComputeMove(mvt[i]);
-            if ((scoreForThisMove>bestWhiteScore) && (position.getTurn()=='W')){
-                bestWhiteScore = scoreForThisMove;
+            if (i==0){
+                predictedNextScore = scoreForThisMove;
             }
-            if ((scoreForThisMove<bestWhiteScore) && (position.getTurn()=='B')){
-                bestWhiteScore = scoreForThisMove;
+            if ((scoreForThisMove>predictedNextScore) && (position.getTurn()==color)){
+                predictedNextScore = scoreForThisMove;
+            }
+            if ((scoreForThisMove<predictedNextScore) && (position.getTurn()!=color)){
+                predictedNextScore = scoreForThisMove;
             }
         }
-        return bestWhiteScore;
+        return predictedNextScore;
     }
 }

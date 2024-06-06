@@ -29,10 +29,10 @@ bool Move::getEventMove() const{
 
 Move::Move(const Move & _Move): oldPieces(_Move.oldPieces),newPieces(_Move.newPieces), oldFlags(_Move.getOldFlags()), newFlags(_Move.getNewFlags()), notation(_Move.getNotation()), eventMove(_Move.getEventMove()), oldNbMoveSinceLastEvent(_Move.getOldNbMoveSinceLastEvent()){}
 
-bool Move::eatsKing(char color) const{
+bool Move::eatsKing(color_t color) const{
     bool res(false);
     for (auto i = oldPieces.begin(); i!=oldPieces.end(); i++){
-        if (i->getColor() != color && i->getKind()=='K'){
+        if (i->getColor() != color && i->getKind()==King){
             res = true;
             break;
         }

@@ -107,6 +107,7 @@ TEST(testMoveGenerator, testAvaiblePositions){
                 missedMoveFoundString = missedMoveFoundString + "-- " + *move + "\n";
             }
         } 
+
         EXPECT_EQ(false, errorFound) << "From position " << firstPosition << " \n False positions generated: \n " << falseMoveFoundString << "\n Positions missed \n" << missedMoveFoundString;
     }
 }

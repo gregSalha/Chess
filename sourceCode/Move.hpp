@@ -34,8 +34,8 @@ class Move{
         bool getEventMove() const;
         int getOldNbMoveSinceLastEvent() const;
 
-        bool eatsKing(char color) const;
+        bool eatsKing(color_t color) const;
 };
 
 
-#endif // MOVE_HPP_INCLUDED
+#endif 
