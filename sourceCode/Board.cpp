@@ -216,7 +216,9 @@ std::vector<Move> Board::getLegalMove(){
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
             std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
+            std::cout<<"This move"<<std::endl;
             for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
+                std::cout<<"This Legal"<<std::endl;
                 if (this->isLegal(table[i], *depl)){
                     res.push_back(this->constructMove(table[i], *depl));
                 }

@@ -21,7 +21,7 @@ protected:
 
 public:
     //Constructeurs, destructeurs
-    Piece():posX(-1), posY(-1), color(White), kind(Empty){};
+    Piece():posX(-1), posY(-1), color(EmptyColor), kind(Empty){};
     Piece(int _posX, int _posY, color_t _color, piece_t _kind):posX(_posX), posY(_posY), color(_color), kind(_kind){};
     Piece(const Piece & _Piece): posX(_Piece.getPosX()),posY(_Piece.getPosY()),color(_Piece.getColor()),kind(_Piece.getKind()){};
     ~Piece(){};
