@@ -1,5 +1,6 @@
 #include "match.hpp"
 #include "evaluationFunctions.hpp"
+#include "PathManager.hpp"
 
 #include <ctime>
 #include <fstream>
@@ -7,29 +8,25 @@
 #include <iomanip>
 #include <memory>
 
-int main(int argc, char** argv)
-{   
-  if (false){
-    std::cout<<"Invalid argument"<<std::endl;
-  }
-  else{
-    //std::shared_ptr<standardMinMaxIA> whiteIA = std::make_shared<standardMinMaxIA>(White, 0, materialCounting);
-    //std::shared_ptr<standardMinMaxIA> blackIA = std::make_shared<standardMinMaxIA>(Black, 1, materialCounting);
-    std::shared_ptr<randomIA> whiteIA = std::make_shared<randomIA>(White);
-    std::shared_ptr<randomIA> blackIA = std::make_shared<randomIA>(Black);
+PathManager globalPathManager("cacheChess");
 
-    Match matchToPlay(1, 100, "rqbk3r/pp1p3p/P3p1pb/2pn1p2/2P5/1Q3P1P/1P1PP1Kn/RNB2BNR w - - 7 17", "testFenFailed", whiteIA, blackIA);
-    //std::string configFile = argv[1];
-    std::string configFile = "install/resources/config1.txt";
-    //bool matchLoaded = matchToPlay.loadFromConfig("./" + configFile);
-    if (false){
-    std::cout << "Loading failed" << std::endl;
-    }
-    else{
-      std::cout<< "loading succeeded" << std::endl;
-      matchToPlay.run();
-    }
-    return 0;
+int main(int argc, char** argv)
+{  
+
+  int numberOfRun                  = 1;
+  int numberOfMove                 = 100; 
+  std::string startingFenPosition  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+  std::string getFolderToSaveGames = "zfrf";
+
+  std::shared_ptr<standardMinMaxIA> whiteIA = std::make_shared<standardMinMaxIA>(White, 1, materialCounting);
+  std::shared_ptr<standardMinMaxIA> blackIA = std::make_shared<standardMinMaxIA>(Black, 1, materialCounting);
+
+  if (!globalPathManager.isValid()){
+    std::cout<<"Could not initialize path manager";
+    return 1;
   }
-  
+
+  Match matchToPlay(numberOfRun, numberOfMove, startingFenPosition, getFolderToSaveGames, whiteIA, blackIA);
+  matchToPlay.run();
+  return 0;
 }

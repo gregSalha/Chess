@@ -2,22 +2,21 @@
 #include "evaluationFunctions.hpp"
 
 void Match::run(){
-    std::system(("rm -rf ./games/" + runID).c_str());
-    std::system(("mkdir -p ./games/" + runID).c_str());
     std::mt19937_64 G(std::time(NULL));
     for (int i = 0; i<numberOfRun; i++){
+
       Board startingPos; 
       bool fenSuccessfullyLoaded = startingPos.loadFEN(fenStartingPosition);
       if (!fenSuccessfullyLoaded){
-        std::cout<<"Loading of fen failed"<<std::endl;
+        std::cout << "Loading of fen failed" << std::endl;
+        return;
       }
-      else{
-        Game partie(startingPos);
-        partie.play(G, maxNumberOfMove, whiteIA, blackIA);
-        std::system(("mkdir -p ./games/" + runID + "/game" + std::to_string(i)).c_str());
-        partie.write("./games/" + runID + "/game" + std::to_string(i));
-        std::cout << "Game " + std::to_string(i+1) << " played out of "<< std::to_string(numberOfRun) << ". Made "<< partie.getNMovedPlayed() << " moves. Result: " << partie.getResult() << std::endl;
-      }
+
+      Game partie(startingPos);
+      partie.play(G, maxNumberOfMove, whiteIA, blackIA);
+      std::string directoryToWriteGame = globalPathManager.getNextValidGameFolder();
+      partie.write(directoryToWriteGame);
+      std::cout << "Game " + std::to_string(i+1) << " played out of "<< std::to_string(numberOfRun) << ". Made "<< partie.getNMovedPlayed() << " moves. Result: " << partie.getResult() << std::endl;
     }
 }
 
@@ -25,21 +24,18 @@ void loadTagIntoDict(std::string line, std::map<std::string, std::string> & dict
   if (line.find(" ")==std::string::npos){
     return;
   }
-  else{
-    std::string tagKey = line.substr(0, line.find(" "));
-    line.erase(0, line.find(" ")+1);
-    std::string tagValue = line;
-    if (tagKey[0] != '['){
-      return;
-    }
-    if ((tagValue.substr(tagValue.length()-3,2) != "\"]") || (tagValue[0] != '\"')){
-      return;
-    }
-    else{
-      dict[tagKey.substr(1, tagKey.length()-1)] = tagValue.substr(1, tagValue.length()-4);
-    }
-    
+  std::string tagKey = line.substr(0, line.find(" "));
+  line.erase(0, line.find(" ")+1);
+  std::string tagValue = line;
+  if (tagKey[0] != '['){
+    return;
   }
+  if ((tagValue.substr(tagValue.length()-3,2) != "\"]") || (tagValue[0] != '\"')){
+    return;
+  }
+  else{
+    dict[tagKey.substr(1, tagKey.length()-1)] = tagValue.substr(1, tagValue.length()-4);
+  } 
 }
 
 bool Match::loadFromConfig(std::string pathToConfigFile){

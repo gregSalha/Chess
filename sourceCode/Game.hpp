@@ -11,6 +11,7 @@
 
 #include "IA.hpp"
 
+
 class Game{
 private:
     Board startingPosition;

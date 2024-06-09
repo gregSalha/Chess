@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "Game.hpp"
+#include "PathManager.hpp"
+
 
 class Match{
     private:

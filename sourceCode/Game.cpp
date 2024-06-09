@@ -2,6 +2,8 @@
 #include <iostream>
 
 
+
+
 void Game::write(std::string placeToSave){
     std::ofstream flux(placeToSave + "/pgnFile.pgn");
     flux << "[Event \"Game from Gregoire Salha Chess Engine\"]\n";

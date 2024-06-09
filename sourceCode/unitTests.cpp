@@ -4,6 +4,11 @@
 #include<set>
 
 #include"Board.hpp"
+#include "PathManager.hpp"
+#include "IA.hpp"
+#include "evaluationFunctions.hpp"
+
+PathManager globalPathManager("cacheChess");
 
 TEST(testMoveGenerator, testPositionCount){
     std::ifstream inFile;
@@ -110,4 +115,18 @@ TEST(testMoveGenerator, testAvaiblePositions){
 
         EXPECT_EQ(false, errorFound) << "From position " << firstPosition << " \n False positions generated: \n " << falseMoveFoundString << "\n Positions missed \n" << missedMoveFoundString;
     }
+}
+
+TEST(testIA, testStandardIA){
+    std::string positionToTest = "kq6/pr6/8/N7/8/5B2/3K4/8 w - - 0 1";
+    Board startingPos; 
+    bool fenSuccessfullyLoaded = startingPos.loadFEN(positionToTest);
+    float val[3] = {-5.0, -8.0, 2.0};
+    for (int i = 0; i<3; i++){
+        standardMinMaxIA iaToTest(White, i+1, materialCounting); 
+        float resForThisPostion = iaToTest.evaluatePosition(startingPos, i+1);
+        EXPECT_EQ(val[i], resForThisPostion);
+    }
+
+
 }
