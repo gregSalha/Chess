@@ -18,8 +18,8 @@ int main(int argc, char** argv)
   std::string startingFenPosition  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
   std::string getFolderToSaveGames = "zfrf";
 
-  std::shared_ptr<standardMinMaxIA> whiteIA = std::make_shared<standardMinMaxIA>(White, 1, materialCounting);
-  std::shared_ptr<standardMinMaxIA> blackIA = std::make_shared<standardMinMaxIA>(Black, 1, materialCounting);
+  std::shared_ptr<standardMinMaxIA> whiteIA = std::make_shared<standardMinMaxIA>(White, 2, materialCounting);
+  std::shared_ptr<standardMinMaxIA> blackIA = std::make_shared<standardMinMaxIA>(Black, 2, materialCounting);
 
   if (!globalPathManager.isValid()){
     std::cout<<"Could not initialize path manager";

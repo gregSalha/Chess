@@ -44,7 +44,11 @@ Move standardMinMaxIA::getNextMove(std::mt19937_64 & G, Board & position) const{
             if (scoreForThisMove == bestScore){
                 bestMove.push_back(mvt[i]);
             }
-            if(scoreForThisMove > bestScore){
+            if((scoreForThisMove > bestScore) && (color==White)){
+                bestMove = {mvt[i]};
+                bestScore = scoreForThisMove;
+            }
+            if((scoreForThisMove < bestScore) && (color==Black)){
                 bestMove = {mvt[i]};
                 bestScore = scoreForThisMove;
             }
@@ -69,9 +73,6 @@ float standardMinMaxIA::evaluatePosition(Board & position, int searchDepth) cons
         std::vector<Move> mvt = position.getLegalMove();
         int nMove = mvt.size();
         if (nMove == 0){
-            if (color==Black){
-                return -evaluationFunction(position);    
-            }
             return evaluationFunction(position);
         }
         float predictedNextScore;

@@ -7,6 +7,7 @@ Created on Mon Feb 19 22:42:11 2024
 
 import chess
 import numpy as np
+import json
 
 def generateListOfFenPositions(Nparties, NMovePerPartie):
     res = []
@@ -26,42 +27,48 @@ def generateListOfFenPositions(Nparties, NMovePerPartie):
     return res
 
 def saveFENPositionList(file, Nparties, NmovePerPartie):
-    res=""
+    res=[]
     listFen = generateListOfFenPositions(Nparties, NmovePerPartie)
     for m in listFen:
-        res = res + m + "\n"
+        res.append(m)
     f = open(file, 'w', newline='')
-    f.write(res)
+    f.write(json.dumps(res, sort_keys=True, indent=4))
     f.close()
     
 def saveMoveCountFromFenList(file, Nparties, NmovePerPartie):
-    res=""
+    res = []
     listFen = generateListOfFenPositions(Nparties, NmovePerPartie)
     for m in listFen:
+        newValue = {}
         board = chess.Board(m)
         allMoves = [m for m in board.legal_moves]
-        res = res + m + "\n" + str(len(allMoves)) + "\n"
+        newValue["fenPosition"] = m
+        newValue["count"] = len(allMoves)
+        res.append(newValue)
+
     f = open(file, 'w', newline='')
-    f.write(res)
+    f.write(json.dumps(res, sort_keys=True, indent=4))
     f.close()
     
-def savePostionsAvaibleFromFen(file, Nparties, NmovePerPartie):
-    res=""
+def savePositionsAvaibleFromFen(file, Nparties, NmovePerPartie):
+    res = []
     listFen = generateListOfFenPositions(Nparties, NmovePerPartie)
     for m in listFen:
-        res = res + m + "\n"
+        newValue = {}
+        newValue["fenStartingPosition"] = m
         board = chess.Board(m)
         allMoves = [m for m in board.legal_moves]
+        newValue["avaiblePositions"] = []
         for possibleMove in allMoves:
             newBoard = chess.Board(m)
             newBoard.push(possibleMove)
-            res = res + newBoard.fen(en_passant="fen") + "\n"
-        res = res + "-#-\n"
+            newValue["avaiblePositions"].append(newBoard.fen(en_passant="fen"))
+        res.append(newValue)
     f = open(file, 'w', newline='')
-    f.write(res)
+    f.write(json.dumps(res, sort_keys=True, indent=4))
     f.close()
     
 if __name__=="__main__":
-    saveFENPositionList("testFileFENPositions.txt", 100, 10)
-    saveMoveCountFromFenList("testFilePositionCount.txt", 100, 10)
-    savePostionsAvaibleFromFen("testFilePositionAvaible.txt", 100, 10)
+    saveFENPositionList("testFileFENPositions.json", 100, 10)
+    saveMoveCountFromFenList("testFilePositionCount.json", 100, 10)
+    savePositionsAvaibleFromFen("testFilePositionAvaible.json", 100, 10)

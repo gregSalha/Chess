@@ -1,4 +1,5 @@
 #include<gtest/gtest.h>
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 #include<set>
@@ -8,88 +9,50 @@
 #include "IA.hpp"
 #include "evaluationFunctions.hpp"
 
+using json = nlohmann::json;
+
 PathManager globalPathManager("cacheChess");
 
 TEST(testMoveGenerator, testPositionCount){
-    std::ifstream inFile;
-    inFile.open("testFilePositionCount.txt");
-    bool continueTest = true;
+    std::ifstream inFile("testFilePositionCount.json");
+    json testData = json::parse(inFile);
+    inFile.close();
 
-    while (continueTest){
-        std::string fen;
-        std::string count;
-        if (!std::getline(inFile, fen)){
-            break;
-        }
-        std::getline(inFile, count);
+    for (int i = 0; i<testData.size(); i++){
+        std::string fen = testData[i]["fenPosition"];
+        int countPositions = testData[i]["count"];
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
         std::vector<Move> listMove = startingPos.getLegalMove();
-        EXPECT_EQ(listMove.size(), std::stoi(count)) << "Failed for FEN postion: " << fen;
+        EXPECT_EQ(listMove.size(), countPositions) << "Failed for FEN postion: " << fen;
     }
-    inFile.close();
 }
 
 TEST(stringFormating, fenNotation){
-    std::ifstream inFile;
-    inFile.open("testFileFENPositions.txt");
-    bool continueTest = true;
+    std::ifstream inFile("testFileFENPositions.json");
+    json testData = json::parse(inFile);
+    inFile.close();
 
-    while (continueTest){
-        std::string fen;
-        if (!std::getline(inFile, fen)){
-            break;
-        }
-        if (fen.back() == '\r'){
-            fen.pop_back();
-        }
+    for (int i = 0; i<testData.size(); i++){
+        std::string fen = testData[i];
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
         std::string resultFen = startingPos.getFENNotation();
         EXPECT_EQ(fen, resultFen);
     }
-    inFile.close();
 }
 
 TEST(testMoveGenerator, testAvaiblePositions){
     std::ifstream inFile;
-    inFile.open("testFilePositionAvaible.txt");
-    bool continueTest = true;
+    inFile.open("testFilePositionAvaible.json");
+    json testData = json::parse(inFile);
+    inFile.close();
     std::string outputMessage = "output";
 
-    while (continueTest){
-        bool entirePositionLoaded = false;
-        bool initialPositionLoaded = false;
-        std::string nextLine = "";
-        std::string firstPosition = "";
-        std::set<std::string> avaiblePositions = {};
-        continueTest = false;
-        int counter = 0;
-        while(std::getline(inFile, nextLine)){
-            continueTest = true;
-            if (nextLine.back() == '\r'){
-                nextLine.pop_back();
-            }
-            outputMessage = "Entered";
-            counter += 1;
-            if (nextLine.substr(0,3) == "-#-"){
-                outputMessage = "next Position found";
-                //continueTest = false;
-                break;
-            }
-            else{
-                if (!initialPositionLoaded){
-                    firstPosition = nextLine;
-                    initialPositionLoaded = true;
-                }
-                else{
-                    avaiblePositions.insert(nextLine);
-                }
-            }
-        }
+    for (json::iterator testCase = testData.begin(); testCase!=testData.end(); testCase++){
+        std::string positionToTest = (*testCase)["fenStartingPosition"];
         Board startingPos; 
-        bool fenSuccessfullyLoaded = startingPos.loadFEN(firstPosition);
-        std::string resultFen = startingPos.getFENNotation();
+        bool fenSuccessfullyLoaded = startingPos.loadFEN(positionToTest);
         std::vector<Move> listMove = startingPos.getLegalMove();
         std::set<std::string> allMoveFound = {};
         for (auto move = listMove.begin(); move != listMove.end(); move++){
@@ -100,7 +63,11 @@ TEST(testMoveGenerator, testAvaiblePositions){
         bool errorFound = false;
         std::string falseMoveFoundString = "";
         std::string missedMoveFoundString = "";
-        for (auto move = allMoveFound.begin(); move != allMoveFound.end(); move++){
+        std::set<std::string> avaiblePositions = {};
+        for (int i = 0; i<(*testCase)["avaiblePositions"].size();i++){
+            avaiblePositions.insert((*testCase)["avaiblePositions"][i]);
+        }
+        for (auto move = (allMoveFound).begin(); move != allMoveFound.end(); move++){
             if (avaiblePositions.find(*move) == avaiblePositions.end()){
                 errorFound = true;
                 falseMoveFoundString = falseMoveFoundString + "-- " + *move + "\n";
@@ -109,24 +76,26 @@ TEST(testMoveGenerator, testAvaiblePositions){
         for (auto move = avaiblePositions.begin(); move != avaiblePositions.end(); move++){
             if (allMoveFound.find(*move) == allMoveFound.end()){
                 errorFound = true;
-                missedMoveFoundString = missedMoveFoundString + "-- " + *move + "\n";
+                missedMoveFoundString = missedMoveFoundString + "-- " + std::string(*move) + "\n";
             }
         } 
-
-        EXPECT_EQ(false, errorFound) << "From position " << firstPosition << " \n False positions generated: \n " << falseMoveFoundString << "\n Positions missed \n" << missedMoveFoundString;
+        EXPECT_EQ(false, errorFound) << "From position " << positionToTest << " \n False positions generated: \n " << falseMoveFoundString << "\n Positions missed \n" << missedMoveFoundString;
     }
 }
 
 TEST(testIA, testStandardIA){
-    std::string positionToTest = "kq6/pr6/8/N7/8/5B2/3K4/8 w - - 0 1";
-    Board startingPos; 
-    bool fenSuccessfullyLoaded = startingPos.loadFEN(positionToTest);
-    float val[3] = {-5.0, -8.0, 2.0};
-    for (int i = 0; i<3; i++){
-        standardMinMaxIA iaToTest(White, i+1, materialCounting); 
-        float resForThisPostion = iaToTest.evaluatePosition(startingPos, i+1);
-        EXPECT_EQ(val[i], resForThisPostion);
+    std::ifstream inFile("testIA.json");
+    json testData = json::parse(inFile);
+    inFile.close();
+
+    for (json::iterator testCase = testData.begin(); testCase!=testData.end(); testCase++){
+        std::string positionToTest = (*testCase)["fenPosition"];
+        Board startingPos; 
+        bool fenSuccessfullyLoaded = startingPos.loadFEN(positionToTest);
+        for (int j = 0; j<(*testCase)["scoresToPredict"].size(); j++){
+            standardMinMaxIA iaToTest(White, j+1, materialCounting); 
+            float resForThisPostion = iaToTest.evaluatePosition(startingPos, j+1);
+            EXPECT_EQ((*testCase)["scoresToPredict"][j], resForThisPostion);
+        }
     }
-
-
 }

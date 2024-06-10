@@ -9,5 +9,6 @@ include(CTest)
 set (CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(external/googletest)
+add_subdirectory(external/json)
 add_subdirectory(resources)
 add_subdirectory(sourceCode)
