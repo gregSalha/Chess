@@ -4,6 +4,9 @@ PathManager::PathManager(std::string nameOfCache){
 
     char* pathToHome = std::getenv("HOME");
     if (pathToHome==NULL){
+        pathToHome = std::getenv("HOMEPATH");
+    }
+    if (pathToHome==NULL){
         m_isValid = false;
         m_numberOfGameCounter = 0;
         m_pathToCacheRoot = "";

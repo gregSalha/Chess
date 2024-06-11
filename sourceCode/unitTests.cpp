@@ -94,8 +94,8 @@ TEST(testIA, testStandardIA){
         bool fenSuccessfullyLoaded = startingPos.loadFEN(positionToTest);
         for (int j = 0; j<(*testCase)["scoresToPredict"].size(); j++){
             standardMinMaxIA iaToTest(White, j+1, materialCounting); 
-            float resForThisPostion = iaToTest.evaluatePosition(startingPos, j+1);
-            EXPECT_EQ((*testCase)["scoresToPredict"][j], resForThisPostion);
+            float resForThisPostion = iaToTest.evaluatePosition(startingPos, j);
+            EXPECT_EQ((*testCase)["scoresToPredict"][j], resForThisPostion) << "From " << positionToTest << " failed to calculate white plausible score " << j << " moves ahead";
         }
     }
 }

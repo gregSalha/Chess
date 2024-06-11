@@ -83,10 +83,10 @@ float standardMinMaxIA::evaluatePosition(Board & position, int searchDepth) cons
             if (i==0){
                 predictedNextScore = scoreForThisMove;
             }
-            if ((scoreForThisMove>predictedNextScore) && (position.getTurn()==color)){
+            if ((scoreForThisMove>predictedNextScore) && (position.getTurn()==White)){
                 predictedNextScore = scoreForThisMove;
             }
-            if ((scoreForThisMove<predictedNextScore) && (position.getTurn()!=color)){
+            if ((scoreForThisMove<predictedNextScore) && (position.getTurn()==Black)){
                 predictedNextScore = scoreForThisMove;
             }
         }
