@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include<set>
+#include<chrono>
 
 #include"Board.hpp"
 #include "PathManager.hpp"
@@ -98,4 +99,33 @@ TEST(testIA, testStandardIA){
             EXPECT_EQ((*testCase)["scoresToPredict"][j], resForThisPostion) << "From " << positionToTest << " failed to calculate white plausible score " << j << " moves ahead";
         }
     }
+}
+
+TEST(testMoveGenerator, testPerformance){
+    const float maxTime = 1;
+    std::vector<float> allPerformances = {};
+
+    std::ifstream inFile("testFileFENPositions.json");
+    json testData = json::parse(inFile);
+    inFile.close();
+
+    int numberOfFailure = 0;
+
+    int numberOfTestCase = testData.size();
+    for (int i = 0; i<testData.size(); i++){
+        std::string fen = testData[i];
+        Board startingPos; 
+        bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
+        auto start = std::chrono::high_resolution_clock::now();
+        std::vector<Move> res = startingPos.getLegalMove();
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float, std::milli> duration = end - start;
+        float executionTime = duration.count(); 
+        if (executionTime/1000 > maxTime){
+            numberOfFailure += 1;
+        }
+        EXPECT_EQ(numberOfFailure, 0) << "Move calculation took more than " << maxTime << " seconds for " << numberOfFailure << " positions out of " << numberOfTestCase;
+    }
+
+
 }
