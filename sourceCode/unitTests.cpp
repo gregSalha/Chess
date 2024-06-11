@@ -102,28 +102,23 @@ TEST(testIA, testStandardIA){
 }
 
 TEST(testMoveGenerator, testPerformance){
-    const float maxTime = 0.002;
+    const float maxTime = 1.5;
     std::vector<float> allPerformances = {};
 
     std::ifstream inFile("testFileFENPositions.json");
     json testData = json::parse(inFile);
     inFile.close();
 
-    int numberOfFailure = 0;
-
     int numberOfTestCase = testData.size();
-    for (int i = 0; i<testData.size(); i++){
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i<numberOfTestCase; i++){
         std::string fen = testData[i];
         Board startingPos; 
-        bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
-        auto start = std::chrono::high_resolution_clock::now();
-        std::vector<Move> res = startingPos.getLegalMove();
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float, std::milli> duration = end - start;
-        float executionTime = duration.count(); 
-        if (executionTime/1000 > maxTime){
-            numberOfFailure += 1;
-        }
+        bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);   
+        std::vector<Move> res = startingPos.getLegalMove(); 
     }
-    EXPECT_EQ(numberOfFailure, 0) << "Move calculation took more than " << maxTime << " seconds for " << numberOfFailure << " positions out of " << numberOfTestCase;
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float, std::milli> duration = end - start;
+    float executionTime = duration.count();
+    EXPECT_TRUE(maxTime*numberOfTestCase > executionTime) << "Took " << executionTime/(1000*maxTime) << " seconds for " << numberOfTestCase << " positions, (" << executionTime/numberOfTestCase <<" ms per position in average, more than tolerated time of " << maxTime << " ms)";
 }

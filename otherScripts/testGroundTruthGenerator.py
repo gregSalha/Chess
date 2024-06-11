@@ -69,6 +69,6 @@ def savePositionsAvaibleFromFen(file, Nparties, NmovePerPartie):
     f.close()
     
 if __name__=="__main__":
-    saveFENPositionList("testFileFENPositions.json", 100, 10)
-    saveMoveCountFromFenList("testFilePositionCount.json", 100, 10)
-    savePositionsAvaibleFromFen("testFilePositionAvaible.json", 100, 10)
+    saveFENPositionList("testFileFENPositions.json", 1000, 10)
+    saveMoveCountFromFenList("testFilePositionCount.json", 1000, 10)
+    savePositionsAvaibleFromFen("testFilePositionAvaible.json", 1000, 10)
