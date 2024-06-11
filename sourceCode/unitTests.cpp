@@ -102,7 +102,7 @@ TEST(testIA, testStandardIA){
 }
 
 TEST(testMoveGenerator, testPerformance){
-    const float maxTime = 1;
+    const float maxTime = 0.002;
     std::vector<float> allPerformances = {};
 
     std::ifstream inFile("testFileFENPositions.json");
@@ -124,8 +124,6 @@ TEST(testMoveGenerator, testPerformance){
         if (executionTime/1000 > maxTime){
             numberOfFailure += 1;
         }
-        EXPECT_EQ(numberOfFailure, 0) << "Move calculation took more than " << maxTime << " seconds for " << numberOfFailure << " positions out of " << numberOfTestCase;
     }
-
-
+    EXPECT_EQ(numberOfFailure, 0) << "Move calculation took more than " << maxTime << " seconds for " << numberOfFailure << " positions out of " << numberOfTestCase;
 }
