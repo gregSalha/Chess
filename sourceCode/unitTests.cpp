@@ -24,7 +24,8 @@ TEST(testMoveGenerator, testPositionCount){
         int countPositions = testData[i]["count"];
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
-        std::vector<Move> listMove = startingPos.getLegalMove();
+        std::vector<Move> listMove;
+        startingPos.getLegalMove(listMove);
         EXPECT_EQ(listMove.size(), countPositions) << "Failed for FEN postion: " << fen;
     }
 }
@@ -54,7 +55,8 @@ TEST(testMoveGenerator, testAvaiblePositions){
         std::string positionToTest = (*testCase)["fenStartingPosition"];
         Board startingPos; 
         bool fenSuccessfullyLoaded = startingPos.loadFEN(positionToTest);
-        std::vector<Move> listMove = startingPos.getLegalMove();
+        std::vector<Move> listMove;
+        startingPos.getLegalMove(listMove);
         std::set<std::string> allMoveFound = {};
         for (auto move = listMove.begin(); move != listMove.end(); move++){
             startingPos.computeMove(*move);
@@ -114,8 +116,10 @@ TEST(testMoveGenerator, testPerformance){
     for (int i = 0; i<numberOfTestCase; i++){
         std::string fen = testData[i];
         Board startingPos; 
-        bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);   
-        std::vector<Move> res = startingPos.getLegalMove(); 
+        bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);  
+        std::vector<Move> res; 
+        res.reserve(100);
+        startingPos.getLegalMove(res); 
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float, std::milli> duration = end - start;

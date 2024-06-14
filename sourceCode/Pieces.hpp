@@ -34,13 +34,13 @@ public:
     char getNotation(bool inUpperCase) const;
 
     //generic explorers
-    void exploreCardinalDirections(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
-    void exploreFixedPositions(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
+    void exploreCardinalDirections(std::vector<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
+    void exploreFixedPositions(std::vector<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & cardinalDirections) const;
 
     Piece deplacePiece(deplacement depl) const;
 
     //Renvoie les la liste des mouvements possibles pour cette piece
-    std::list<deplacement> getDeplacement(const std::vector<Piece> & table, boardFlags flags) const;
+    std::vector<deplacement> getDeplacement(const std::vector<Piece> & table, boardFlags flags) const;
 
     friend void operator<<(std::ostream & flux, const Piece & piece);
     friend bool operator==(Piece const & l, Piece const & r);

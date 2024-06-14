@@ -46,7 +46,7 @@ class Board{
         std::string getFENNotation() const;
 
         //std::list<Move> getPotentialMove() const;
-        std::vector<Move> getLegalMove();
+        void getLegalMove(std::vector<Move> & resContainer);
         friend void operator<< (std::ostream & flux, const Board & B);
 };
 

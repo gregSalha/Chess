@@ -211,21 +211,35 @@ Piece Board::operator[](int index) const{
     return table[index];
 }
 
-std::vector<Move> Board::getLegalMove(){
-    std::vector<Move> res(0);
+void Board::getLegalMove(std::vector<Move> & resContainer){
+    bool attackedCases[64];
+    std::fill_n(attackedCases, 64, false);
+    bool isInCheck = false;
+    for (int i = 0; i<64; i++){
+        if (table[i].getColor()!=turn && table[i].getColor()!=EmptyColor){
+            std::vector<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
+            for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
+                attackedCases[getIndex(depl->getDestinationX(), depl->getDestinationY())] = true;
+                if (table[getIndex(depl->getDestinationX(), depl->getDestinationY())].getColor() == turn && table[getIndex(depl->getDestinationX(), depl->getDestinationY())].getKind() == King){
+                    isInCheck = true;
+                }
+            } 
+        }
+    }
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
-            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
-            //std::cout<<"This move"<<std::endl;
+            std::vector<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
             for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
-                //std::cout<<"This Legal"<<std::endl;
+                if (table[i].getKind() != King && !attackedCases[i] && !isInCheck){
+                    resContainer.push_back(this->constructMove(table[i], *depl));
+                    continue;
+                }
                 if (this->isLegal(table[i], *depl)){
-                    res.push_back(this->constructMove(table[i], *depl));
+                    resContainer.push_back(this->constructMove(table[i], *depl));
                 }
             }
         }
     }
-    return res;
 }
 
 void Board::computeMove(const Move & m){
@@ -273,7 +287,7 @@ void operator<<(std::ostream & flux, const Board & B){
 bool Board::kingIsPending(){
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
-            std::list<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
+            std::vector<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
             for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
                 if ((this->constructMove(table[i], *depl)).eatsKing(turn)){
                     return true;

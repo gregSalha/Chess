@@ -4,7 +4,7 @@ void operator<<(std::ostream & flux, const Piece & p){
     flux << p.color << p.kind << " ";
 }
 
-void Piece::exploreCardinalDirections(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & listCardinal) const{
+void Piece::exploreCardinalDirections(std::vector<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & listCardinal) const{
     for (auto cardinal=listCardinal.begin(); cardinal!=listCardinal.end(); cardinal++){
         int currentX(posX);
         int currentY(posY);
@@ -17,32 +17,32 @@ void Piece::exploreCardinalDirections(std::list<deplacement> & res, const std::v
             else{
                 if (table[getIndex(currentX, currentY)].getKind()!=Empty){
                     if (table[getIndex(currentX, currentY)].getColor()!=color){
-                        res.push_front(deplacement(currentX, currentY, Standard));
+                        res.push_back(deplacement(currentX, currentY, Standard));
                     }
                     break;
                 }
                 else{
-                    res.push_front(deplacement(currentX, currentY, Standard));
+                    res.push_back(deplacement(currentX, currentY, Standard));
                 }
             }
         }
     }
 }
 
-void Piece::exploreFixedPositions(std::list<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & positionsToExplore) const{
+void Piece::exploreFixedPositions(std::vector<deplacement> & res, const std::vector<Piece> & table, std::list<std::pair<int, int>> & positionsToExplore) const{
     for (auto pos=positionsToExplore.begin(); pos != positionsToExplore.end(); pos++){
         int currentX = posX + pos->first;
         int currentY = posY + pos->second;
         if (currentX>=0 && currentX<8 && currentY>=0 && currentY<8){
             if (table[getIndex(currentX, currentY)].getColor()!=color){
-                res.push_front(deplacement(currentX, currentY, Standard));
+                res.push_back(deplacement(currentX, currentY, Standard));
             }
         }
     }
 }
 
-std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, boardFlags flags) const{
-    std::list<deplacement> res(0);
+std::vector<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, boardFlags flags) const{
+    std::vector<deplacement> res = {};
     switch(kind){
         case Pawn:{
             int codeCouleur;
@@ -62,27 +62,27 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
             }
             for (auto tag= tags.begin(); tag != tags.end(); tag++){
                 if (table[getIndex(posX, posY+codeCouleur)].getKind() == Empty){
-                    res.push_front(deplacement(posX, posY+codeCouleur, *tag));
+                    res.push_back(deplacement(posX, posY+codeCouleur, *tag));
                 }
                 if (posX>0){
                     if (table[getIndex(posX-1, posY+codeCouleur)].getColor() != color && table[getIndex(posX-1, posY+codeCouleur)].getKind() != Empty){
-                        res.push_front(deplacement(posX-1, posY+codeCouleur, *tag));
+                        res.push_back(deplacement(posX-1, posY+codeCouleur, *tag));
                     }
                 }
                 if (posX<7){
                     if (table[getIndex(posX+1, posY+codeCouleur)].getColor() != color && table[getIndex(posX+1, posY+codeCouleur)].getKind() != Empty){
-                        res.push_front(deplacement(posX+1, posY+codeCouleur, *tag));
+                        res.push_back(deplacement(posX+1, posY+codeCouleur, *tag));
                     }
                 }
             }
             if (posY == 1 + 5*(1-codeCouleur)/2){
                 if (table[getIndex(posX, posY+codeCouleur)].getKind() == Empty && table[getIndex(posX, posY+2*codeCouleur)].getKind() == Empty){
-                    res.push_front(deplacement(posX, posY+2*codeCouleur, PawnFirstJump));
+                    res.push_back(deplacement(posX, posY+2*codeCouleur, PawnFirstJump));
                 }
             }
             if (flags.getEnPassantFlag() != -1 && 2*posY == 7 + codeCouleur){
                 if (posX==flags.getEnPassantFlag()-1 || posX==flags.getEnPassantFlag()+1){
-                    res.push_front(deplacement(flags.getEnPassantFlag(), posY + codeCouleur, enPassant));
+                    res.push_back(deplacement(flags.getEnPassantFlag(), posY + codeCouleur, enPassant));
                 }
             }
             break;
@@ -120,7 +120,7 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
                             }
                         }
                         if (canRock){
-                            res.push_front(deplacement(2, 0, bigRockWhite));
+                            res.push_back(deplacement(2, 0, bigRockWhite));
                         }
                     }
                     if (flags.getSmallRockWhite()==1){ 
@@ -132,7 +132,7 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
                             }
                         }
                         if (canRock){
-                            res.push_front(deplacement(6, 0, smallRockWhite));
+                            res.push_back(deplacement(6, 0, smallRockWhite));
                         }
                     }
                     break;
@@ -147,7 +147,7 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
                             }
                         }
                         if (canRock){
-                            res.push_front(deplacement(2, 7, bigRockBlack));
+                            res.push_back(deplacement(2, 7, bigRockBlack));
                         }
                     }
                     if (flags.getSmallRockBlack()==1){ 
@@ -159,7 +159,7 @@ std::list<deplacement> Piece::getDeplacement(const std::vector<Piece> & table, b
                             }
                         }
                         if (canRock){
-                            res.push_front(deplacement(6, 7, smallRockBlack));
+                            res.push_back(deplacement(6, 7, smallRockBlack));
                         }
                     }
                     break;
