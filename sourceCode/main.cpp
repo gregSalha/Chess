@@ -16,7 +16,7 @@ int main(int argc, char** argv)
   int numberOfRun                  = 1;
   int numberOfMove                 = 100; 
   std::string startingFenPosition  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-  startingFenPosition              = "r3n3/n1pbqQbk/p2pp1pr/1pP1P3/PP1P3P/2N3B1/5P1R/RN2KB2 b Q - 10 21";
+  //startingFenPosition              = "r3n3/n1pbqQbk/p2pp1pr/1pP1P3/PP1P3P/2N3B1/5P1R/RN2KB2 b Q - 10 21";
   std::string getFolderToSaveGames = "zfrf";
 
   std::shared_ptr<standardMinMaxIA> whiteIA = std::make_shared<standardMinMaxIA>(White, 3, materialCounting);

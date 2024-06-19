@@ -42,7 +42,7 @@ void Game::write(std::string placeToSave){
 
 void Game::play(std::mt19937_64 & G, int nCoup, std::shared_ptr<IA> whiteIA, std::shared_ptr<IA> blackIA){
     while(nMovedPlayed < nCoup){
-        std::cout<<"--Move played" << std::endl;
+        std::cout<<"--Move " << nMovedPlayed << " played" << std::endl;
         Move nextMove;
         if (currentPosition.getNbMoveSinceLastEvent() >= 50){
             result = 'D';
@@ -82,9 +82,6 @@ void Game::play(std::mt19937_64 & G, int nCoup, std::shared_ptr<IA> whiteIA, std
                 currentPosition.unComputeMove(passTurn);
                 break;
             }
-        }
-        if (nextMove.getNotation()[0]=='O'){
-            std::cout<<"Rocked here"<<std::endl;
         }
         moveRecord.push_back(nextMove);
         currentPosition.computeMove(nextMove);

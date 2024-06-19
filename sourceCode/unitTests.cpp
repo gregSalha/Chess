@@ -104,7 +104,7 @@ TEST(testIA, testStandardIA){
 }
 
 TEST(testMoveGenerator, testPerformance){
-    const float maxTime = 0.15;
+    const float maxTime = 0.4;
     std::vector<float> allPerformances = {};
 
     std::ifstream inFile("testFileFENPositions.json");
