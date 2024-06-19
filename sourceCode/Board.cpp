@@ -211,26 +211,41 @@ Piece Board::operator[](int index) const{
     return table[index];
 }
 
-void Board::getLegalMove(std::vector<Move> & resContainer){
-    bool attackedCases[64];
-    std::fill_n(attackedCases, 64, false);
-    bool isInCheck = false;
+bool Board::getIsInCheck(const std::array<bool, 64> & attackedPositions) const{
+    for (int i = 0; i<64; i++){
+        if (table[i].getColor()==turn && table[i].getKind()==King){
+            return attackedPositions[i];
+        } 
+    }
+    return false;
+}
+
+std::array<bool, 64> Board::getAttackedPositions() const{
+    std::array<bool, 64> res;
+    for (int i = 0; i<64; i++){
+        res[i] = false;
+    }
     for (int i = 0; i<64; i++){
         if (table[i].getColor()!=turn && table[i].getColor()!=EmptyColor){
             std::vector<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
             for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
-                attackedCases[getIndex(depl->getDestinationX(), depl->getDestinationY())] = true;
-                if (table[getIndex(depl->getDestinationX(), depl->getDestinationY())].getColor() == turn && table[getIndex(depl->getDestinationX(), depl->getDestinationY())].getKind() == King){
-                    isInCheck = true;
-                }
+                res[getIndex(depl->getDestinationX(), depl->getDestinationY())] = true;
             } 
         }
     }
+    return res;
+}
+
+void Board::getLegalMove(std::vector<Move> & resContainer){
+    std::array<bool, 64> attackedPositions = getAttackedPositions();
+    std::array<bool, 64> isPinned = getPinnedPositions(attackedPositions);
+    bool isInCheck = getIsInCheck(attackedPositions);
+
     for(int i = 0; i <64; i++){
         if (table[i].getColor()==turn){
             std::vector<deplacement> deplacementForThisPiece = table[i].getDeplacement(table, flags);
             for (auto depl = deplacementForThisPiece.begin(); depl != deplacementForThisPiece.end(); depl++){
-                if (table[i].getKind() != King && !attackedCases[i] && !isInCheck){
+                if (table[i].getKind() != King && !isPinned[i] && !isInCheck){
                     resContainer.push_back(this->constructMove(table[i], *depl));
                     continue;
                 }
@@ -530,5 +545,45 @@ std::string Board::getFENNotation() const{
     }
     res = res + " " + std::to_string(nbMoveSinceLastEvent) + " " +  std::to_string(nbMove);
 
+    return res;
+}
+
+std::array<bool, 64> Board::getPinnedPositions(const std::array<bool, 64> & attackedPositions) const{
+    std::array<bool, 64> res;
+    for (int i = 0; i<64; i++){
+        res[i] = false;
+    }
+    //std::fill_n(res, 64, false);
+    int posXKing = -1;
+    int posYKing = -1;
+    for (int i=0; i<64; i++){
+        if (table[i].getColor()==turn && table[i].getKind()==King){
+            posXKing = table[i].getPosX();
+            posYKing = table[i].getPosY();
+            break;
+        }
+    }
+    for (int i = -1; i<2; i++){
+        for (int j = -1; j<2; j++){
+            if (i==0 && j==0){
+                continue;
+            }
+            int counter = 0;
+            while (true){
+                counter += 1;
+                if (posXKing + counter*i> 7 || posXKing + counter*i < 0 || posYKing + counter*j > 7 || posYKing + counter*j < 0){
+                    break;
+                }
+                int currentIndex = getIndex(posXKing + counter*i, posYKing + counter*j);
+                if (table[currentIndex].getColor() != EmptyColor && table[currentIndex].getColor() != turn){
+                    break;
+                }
+                if (table[currentIndex].getColor() == turn){
+                    res[currentIndex] = attackedPositions[currentIndex];
+                    break;
+                }
+            }
+        }
+    }
     return res;
 }

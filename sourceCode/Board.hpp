@@ -2,6 +2,7 @@
 #define BOARD_HPP_INCLUDED
 #include <vector>
 #include <cctype>
+#include<array>
 
 #include"Pieces.hpp"
 #include"Move.hpp"
@@ -16,6 +17,9 @@ class Board{
         color_t turn;
         int nbMove;
         int nbMoveSinceLastEvent;
+
+        std::array<bool, 64> getAttackedPositions() const;
+        std::array<bool, 64> getPinnedPositions(const std::array<bool, 64> & attackedPositions) const;
     public:
         //constructeurs et accesseurs
         Board();
@@ -35,6 +39,7 @@ class Board{
         void unComputeMove(const Move & m);
 
         bool kingIsPending();
+        bool getIsInCheck(const std::array<bool, 64> & attackedPositions) const;
         std::vector<Move> getMovesToCheck(const Piece & movingPiece, const deplacement & d);
         bool isLegal(const Piece & movingPiece, const deplacement & d);
         bool isLegal(const Move & m);
