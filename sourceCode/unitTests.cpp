@@ -126,3 +126,21 @@ TEST(testMoveGenerator, testPerformance){
     float executionTime = duration.count();
     EXPECT_TRUE(maxTime*numberOfTestCase > executionTime) << "Took " << executionTime/(1000*maxTime) << " seconds for " << numberOfTestCase << " positions, (" << executionTime/numberOfTestCase <<" ms per position in average, more than tolerated time of " << maxTime << " ms)";
 }
+
+TEST(testIA, testAlphaBetaPruning){
+    std::ifstream inFile("testFileFENPositions.json");
+    json testData = json::parse(inFile);
+    inFile.close();
+
+    standardMinMaxIA IA1(White, 4, materialCounting);
+    alphaBetaPruningStandardIA IA2(White, 4, materialCounting);
+
+    for (int i = 0; i<100; i++){
+        std::string fen = testData[i];
+        Board startingPos; 
+        bool fenSuccessfullyLoaded = startingPos.loadFEN(fen);
+        float res1 = IA1.evaluatePosition(startingPos, 3);
+        float res2 = IA2.evaluatePosition(startingPos, 3);
+        EXPECT_EQ(res1, res2) << "Failed for FEN postion: " << fen;
+    }
+}
