@@ -553,7 +553,6 @@ std::array<bool, 64> Board::getPinnedPositions(const std::array<bool, 64> & atta
     for (int i = 0; i<64; i++){
         res[i] = false;
     }
-    //std::fill_n(res, 64, false);
     int posXKing = -1;
     int posYKing = -1;
     for (int i=0; i<64; i++){
@@ -569,18 +568,32 @@ std::array<bool, 64> Board::getPinnedPositions(const std::array<bool, 64> & atta
                 continue;
             }
             int counter = 0;
+            int indexOfPinnedPiece = -1;
             while (true){
                 counter += 1;
                 if (posXKing + counter*i> 7 || posXKing + counter*i < 0 || posYKing + counter*j > 7 || posYKing + counter*j < 0){
                     break;
                 }
                 int currentIndex = getIndex(posXKing + counter*i, posYKing + counter*j);
-                if (table[currentIndex].getColor() != EmptyColor && table[currentIndex].getColor() != turn){
-                    break;
+                if (table[currentIndex].getColor() == EmptyColor){
+                    continue;
                 }
                 if (table[currentIndex].getColor() == turn){
-                    res[currentIndex] = attackedPositions[currentIndex];
+                    if (indexOfPinnedPiece==-1){
+                        indexOfPinnedPiece = currentIndex;
+                        continue;
+                    }
                     break;
+                }
+                if (i==0 || j==0){
+                    if (table[currentIndex].getKind() == Rook || table[currentIndex].getKind() == Queen){
+                        res[indexOfPinnedPiece] = true;
+                    } 
+                }
+                else{
+                    if (table[currentIndex].getKind() == Bishop || table[currentIndex].getKind() == Queen){
+                        res[indexOfPinnedPiece] = true;
+                    } 
                 }
             }
         }
